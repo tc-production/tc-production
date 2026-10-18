@@ -464,26 +464,47 @@
         let scheduleFilter = 'all';
 
         // 讀取 Supabase 資料
-        async function loadDataFromSupabase() {
-            if (!supabaseClient) {
-                updateSyncStatus(false, "暫存模式 (本機數據)");
-                loadFromLocalBackup();
-                return;
-            }
+        async function loadDataFromSupabase() {{
+    if (!supabaseClient) {
+        updateSyncStatus(false, "暫存模式 (本機數據)");
+        loadFromLocalBackup();
+        return;
+    }
 
-            try {
-                const { data, error } = await supabaseClient
-                    .from('roster_data')
-                    .select('content')
-                    .eq('id', 'main_store')
-                    .maybeSingle();
+    try {
+        const { data, error } = await supabaseClient
+            .from('roster_data')
+            .select('content')
+            .eq('id', 'main_store')
+            .maybeSingle();
 
-                if (error) {
-                    console.warn("Supabase 讀取出錯或資料表尚未建置:", error);
-                    updateSyncStatus(false, "請先至 Supabase 建立資料表");
-                    loadFromLocalBackup();
-                    return;
-                }
+        // 只有當明確回傳 404 (Table 不存在) 或 42P01 錯誤時，才視為沒建表
+        if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
+            console.warn("資料表不存在:", error);
+            updateSyncStatus(false, "請先至 Supabase 建立資料表");
+            loadFromLocalBackup();
+            return;
+        }
+
+        if (data && data.content) {
+            // 順利讀取到雲端資料
+            volunteers = data.content.volunteers || volunteers;
+            availabilities = data.content.availabilities || {};
+            rosters = data.content.rosters || {};
+            managerPassword = data.content.managerPassword || managerPassword;
+            updateSyncStatus(true, "已同步 Supabase");
+        } else {
+            // 表格存在但裡面還沒有 main_store 資料，自動觸發第一次寫入
+            await syncToSupabase();
+        }
+        refreshUI();
+    } catch (err) {
+        console.error("Supabase 連線例外:", err);
+        // 發生例外時嘗試寫入一次以激活存取
+        await syncToSupabase();
+        refreshUI();
+    }
+}
 
                 if (data && data.content) {
                     volunteers = data.content.volunteers || volunteers;
