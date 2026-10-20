@@ -40,19 +40,8 @@
     <!-- Main Content Container -->
     <main class="max-w-md mx-auto w-full px-4 pt-4 flex-1">
 
-        <!-- Active User Selector -->
-        <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm mb-4 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-circle-user text-emerald-600 text-lg"></i>
-                <div class="text-xs">
-                    <span class="text-slate-400 block text-[10px]">當前登入義工：</span>
-                    <span id="current-user-display" class="font-bold text-slate-800">載入中...</span>
-                </div>
-            </div>
-            <button onclick="switchTab('profile')" class="text-xs text-emerald-600 font-semibold hover:underline">
-                切換 / 編輯身分 <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </button>
-        </div>
+        <!-- Active User Selector Container -->
+        <div id="top-user-selector-container"></div>
 
         <!-- TAB 1: RULES -->
         <section id="tab-rules" class="space-y-4">
@@ -127,9 +116,12 @@
         <!-- TAB 3: PROFILE -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-2">義工設定與個人進度</h2>
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <h2 class="text-base font-bold text-slate-800">義工設定與個人進度</h2>
+                    <span id="profile-manager-badge" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold hidden"><i class="fa-solid fa-lock text-[9px]"></i> 管理員編輯模式</span>
+                </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">切換目前登入義工</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">選擇編輯對象義工</label>
                     <select id="profile-user-select" onchange="switchCurrentUser(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm"></select>
                 </div>
                 <div class="space-y-3">
@@ -142,11 +134,11 @@
                         <input type="text" id="profile-contact" class="w-full border border-slate-300 rounded-xl p-2 text-sm">
                     </div>
                     <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
-                        <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-graduation-cap"></i> 目前學習/培訓項目</label>
+                        <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-graduation-cap"></i> 目前學習/培訓項目 (僅管理員可編輯)</label>
                         <input type="text" id="profile-learning" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任崗位 (可複選)</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任崗位 (可複選，僅管理員可編輯)</label>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-lighting" value="燈光"> 燈光</label>
                             <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-vj" value="VJ"> VJ</label>
@@ -155,9 +147,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">更新資料</button>
-                    <button onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200">新增義工</button>
+                <div id="profile-action-buttons" class="flex gap-2">
+                    <button id="save-profile-btn" onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">更新資料</button>
+                    <button id="add-volunteer-btn" onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200">新增義工</button>
                 </div>
             </div>
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
@@ -314,6 +306,7 @@
         }
 
         function refreshUI() {
+            renderTopUserSelector();
             populateUserSelector();
             updateProfileUI();
             renderVolunteersLearningSummary();
@@ -322,16 +315,36 @@
             renderMasterRoster();
         }
 
+        function renderTopUserSelector() {
+            const container = document.getElementById('top-user-selector-container');
+            if (!container) return;
+            const curr = volunteers.find(v => v.id === activeUserId);
+            container.innerHTML = `
+                <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm mb-4 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <i class="fa-solid fa-circle-user text-emerald-600 text-xl shrink-0"></i>
+                        <div class="text-xs flex-1 min-w-0">
+                            <span class="text-slate-400 block text-[10px]">當前選取義工：</span>
+                            <select onchange="switchCurrentUser(this.value)" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs w-full">
+                                ${volunteers.map(v => `<option value="${v.id}" ${v.id === activeUserId ? 'selected' : ''}>${v.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function populateUserSelector() {
-            const select = document.getElementById('profile-user-select'), display = document.getElementById('current-user-display');
+            const select = document.getElementById('profile-user-select');
             if (!select) return;
             select.innerHTML = volunteers.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
             if (activeUserId) select.value = activeUserId;
-            const curr = volunteers.find(v => v.id === activeUserId);
-            if (display) display.textContent = curr ? curr.name : '義工';
         }
 
-        function switchCurrentUser(id) { activeUserId = id; populateUserSelector(); updateProfileUI(); renderScheduleCards(); }
+        function switchCurrentUser(id) {
+            activeUserId = id;
+            refreshUI();
+        }
 
         function updateProfileUI() {
             const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
@@ -342,9 +355,36 @@
             document.getElementById('role-vj').checked = u.roles.includes('VJ');
             document.getElementById('role-ppr').checked = u.roles.includes('PPR');
             document.getElementById('role-sm').checked = u.roles.includes('舞監');
+
+            const isReadonly = !isManagerMode;
+            document.getElementById('profile-name').readOnly = isReadonly;
+            document.getElementById('profile-contact').readOnly = isReadonly;
+            document.getElementById('profile-learning').readOnly = isReadonly;
+            
+            ['role-lighting', 'role-vj', 'role-ppr', 'role-sm'].forEach(id => {
+                document.getElementById(id).disabled = isReadonly;
+            });
+
+            const badge = document.getElementById('profile-manager-badge');
+            const saveBtn = document.getElementById('save-profile-btn');
+            const addBtn = document.getElementById('add-volunteer-btn');
+
+            if (isManagerMode) {
+                if (badge) badge.classList.remove('hidden');
+                if (saveBtn) saveBtn.classList.remove('hidden');
+                if (addBtn) addBtn.classList.remove('hidden');
+            } else {
+                if (badge) badge.classList.add('hidden');
+                if (saveBtn) saveBtn.classList.add('hidden');
+                if (addBtn) addBtn.classList.add('hidden');
+            }
         }
 
         function saveProfile() {
+            if (!isManagerMode) {
+                alert("只有管理者模式可以修改義工資料！");
+                return;
+            }
             const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
             u.name = document.getElementById('profile-name').value.trim() || u.name;
             u.contact = document.getElementById('profile-contact').value.trim();
@@ -359,6 +399,10 @@
         }
 
         function addNewVolunteerPrompt() {
+            if (!isManagerMode) {
+                alert("只有管理者模式可以新增義工！");
+                return;
+            }
             const name = prompt("輸入義工姓名：");
             if (!name) return;
             const newV = { id: 'v_' + Date.now(), name: name.trim(), contact: '', learning: '', roles: ['燈光'] };
