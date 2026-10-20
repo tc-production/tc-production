@@ -118,4 +118,483 @@
                 <h2 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-calendar-check text-emerald-600"></i> 服事輪值表</h2>
                 <div class="flex bg-slate-200 p-0.5 rounded-lg text-[11px]">
                     <button id="filter-all-btn" onclick="filterScheduleView('all')" class="px-2.5 py-1 rounded-md bg-white font-bold">全部場次</button>
-                    <button id="filter-mine-btn" onclick="filterScheduleView('mine')" class="px-2.5 py-1 rounded-md text-slate-
+                    <button id="filter-mine-btn" onclick="filterScheduleView('mine')" class="px-2.5 py-1 rounded-md text-slate-600">只看我的班</button>
+                </div>
+            </div>
+            <div id="schedule-cards-list" class="space-y-3.5"></div>
+        </section>
+
+        <!-- TAB 3: PROFILE -->
+        <section id="tab-profile" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-2">義工設定與個人進度</h2>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">切換目前登入義工</label>
+                    <select id="profile-user-select" onchange="switchCurrentUser(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm"></select>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">義工姓名</label>
+                        <input type="text" id="profile-name" class="w-full border border-slate-300 rounded-xl p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">聯絡電話 / Line ID</label>
+                        <input type="text" id="profile-contact" class="w-full border border-slate-300 rounded-xl p-2 text-sm">
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                        <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-graduation-cap"></i> 目前學習/培訓項目</label>
+                        <input type="text" id="profile-learning" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任崗位 (可複選)</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-lighting" value="燈光"> 燈光</label>
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-vj" value="VJ"> VJ</label>
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-ppr" value="PPR"> PPR</label>
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-sm" value="舞監"> 舞監</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">更新資料</button>
+                    <button onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200">新增義工</button>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                <h3 class="text-xs font-bold text-slate-800 border-b border-slate-100 pb-2"><i class="fa-solid fa-users text-emerald-600"></i> 全員義工學習進度總覽</h3>
+                <div id="volunteers-learning-summary" class="space-y-2 text-xs"></div>
+            </div>
+        </section>
+
+        <!-- TAB 4: MANAGER WORKSTATION -->
+        <section id="tab-manager" class="space-y-4 hidden">
+            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md flex items-center justify-between">
+                <span class="font-bold text-sm"><i class="fa-solid fa-sliders text-amber-400"></i> 管理者手動排班工作台</span>
+                <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">管理模式</span>
+            </div>
+            <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between text-xs font-bold">
+                <label>選擇排班週末：</label>
+                <select id="manager-week-selector" onchange="renderManagerBoard()" class="bg-slate-50 border border-slate-300 rounded-lg p-1.5"></select>
+            </div>
+            <div id="manager-board-container" class="space-y-4"></div>
+        </section>
+
+        <!-- TAB 5: MASTER ROSTER -->
+        <section id="tab-admin" class="space-y-4 hidden">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 space-y-2">
+                <div class="font-bold text-sm"><i class="fa-solid fa-file-excel"></i> 排班總表匯出</div>
+                <div class="flex gap-2">
+                    <button onclick="exportCSV()" class="flex-1 bg-emerald-600 text-white py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-download"></i> 下載 CSV</button>
+                    <button onclick="copyToClipboardTable()" class="flex-1 bg-white text-emerald-800 border border-emerald-300 py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-copy"></i> 複製表格</button>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto shadow-sm">
+                <table class="w-full text-left text-xs text-slate-700">
+                    <thead class="bg-slate-100 font-medium border-b border-slate-200">
+                        <tr>
+                            <th class="p-2.5">日期場次</th>
+                            <th class="p-2.5">💡 燈光</th>
+                            <th class="p-2.5">🖥️ VJ</th>
+                            <th class="p-2.5">🎛️ PPR</th>
+                            <th class="p-2.5">🎬 舞監</th>
+                        </tr>
+                    </thead>
+                    <tbody id="master-roster-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
+        <div class="max-w-md mx-auto flex justify-around py-1.5">
+            <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1.5 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
+            <button id="nav-schedule" onclick="switchTab('schedule')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-base mb-0.5"></i><span class="text-[10px]">輪值表</span></button>
+            <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium hidden"><i class="fa-solid fa-sliders text-base mb-0.5"></i><span class="text-[10px]">手動排班</span></button>
+            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-user text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
+            <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-file-export text-base mb-0.5"></i><span class="text-[10px]">總表</span></button>
+        </div>
+    </nav>
+
+    <!-- Modal: Password -->
+    <div id="password-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-5 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-sm text-slate-900 border-b pb-2"><i class="fa-solid fa-lock text-emerald-600"></i> 管理者驗證</h3>
+            <div>
+                <input type="password" id="manager-password-input" class="w-full border rounded-xl p-2 text-sm text-center font-mono" placeholder="****">
+                <p id="password-error" class="text-[11px] text-red-500 mt-1 hidden">密碼錯誤！</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closePasswordModal()" class="flex-1 bg-slate-100 py-2 rounded-xl text-xs font-semibold">取消</button>
+                <button onclick="verifyManagerPassword()" class="flex-1 bg-emerald-600 text-white py-2 rounded-xl text-xs font-semibold">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-full text-xs z-50 transition duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i><span id="toast-message">操作成功</span>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://ejesbvchrstwzbilkvso.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqZXNidmNocnN0d3piaWxrdnNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0Nzg2ODAsImV4cCI6MjEwODA1NDY4MH0.XkZe6USy0HHZzghJ0WyZNAoDFKZEKE8BPdB6w8ZjQGI";
+
+        let supabaseClient = null;
+        try {
+            if (window.supabase?.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (e) { console.warn("Supabase 跳過", e); }
+
+        const ROLES = ['燈光', 'VJ', 'PPR', '舞監'];
+        const SESSIONS = [
+            { key: 'Sat_1900', name: '週六 19:00', day: 'Sat' },
+            { key: 'Sun_0930', name: '週日 09:30', day: 'Sun' },
+            { key: 'Sun_1400', name: '週日 14:00', day: 'Sun' }
+        ];
+
+        let isManagerMode = false, managerPassword = "1234", activeUserId = "v1";
+        let volunteers = [
+            { id: 'v1', name: '子祈', contact: '', roles: ['燈光', 'VJ'], learning: '' },
+            { id: 'v2', name: 'Joshua', contact: '', roles: ['PPR', '舞監'], learning: '' },
+            { id: 'v3', name: '宥安', contact: '', roles: ['燈光'], learning: '' },
+            { id: 'v4', name: '凱欣', contact: '', roles: ['VJ'], learning: '' },
+            { id: 'v5', name: '捷飛', contact: '', roles: ['PPR'], learning: '' },
+            { id: 'v6', name: '紀宏', contact: '', roles: ['舞監'], learning: '' }
+        ];
+        let rosters = {}, weekendDates = [], scheduleFilter = 'all';
+
+        async function loadDataFromSupabase() {
+            if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); loadFromLocal(); return; }
+            try {
+                const { data } = await supabaseClient.from('roster_data').select('content').eq('id', 'main_store').maybeSingle();
+                if (data?.content) {
+                    volunteers = data.content.volunteers || volunteers;
+                    rosters = data.content.rosters || {};
+                    managerPassword = data.content.managerPassword || managerPassword;
+                    updateSyncStatus(true, "已同步 Supabase");
+                } else { await syncToSupabase(); }
+            } catch (err) { loadFromLocal(); }
+            refreshUI();
+        }
+
+        async function syncToSupabase() {
+            localStorage.setItem('church_vols', JSON.stringify(volunteers));
+            localStorage.setItem('church_rosters', JSON.stringify(rosters));
+            if (!supabaseClient) return;
+            const { error } = await supabaseClient.from('roster_data').upsert({ id: 'main_store', content: { volunteers, rosters, managerPassword } });
+            updateSyncStatus(!error, error ? "連線錯誤" : "已同步 Supabase");
+        }
+
+        function loadFromLocal() {
+            const v = localStorage.getItem('church_vols'), r = localStorage.getItem('church_rosters');
+            if (v) volunteers = JSON.parse(v);
+            if (r) rosters = JSON.parse(r);
+            refreshUI();
+        }
+
+        function updateSyncStatus(online, msg) {
+            document.getElementById('sync-status-dot').className = online ? "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" : "w-2 h-2 rounded-full bg-amber-500";
+            document.getElementById('sync-status-text').textContent = msg;
+        }
+
+        function generateWeekendDates() {
+            const list = [], now = new Date(), endDate = new Date(now.getFullYear(), 11, 31);
+            let curr = new Date(now);
+            while (curr.getDay() !== 6 && curr <= endDate) curr.setDate(curr.getDate() + 1);
+            let idx = 1;
+            while (curr <= endDate) {
+                const sat = new Date(curr), sun = new Date(curr); sun.setDate(sun.getDate() + 1);
+                const fmt = d => `${d.getMonth() + 1}/${d.getDate()}`;
+                list.push({ id: idx++, label: `${sat.getMonth() + 1}月第 ${Math.ceil(sat.getDate() / 7)} 週`, saturdayStr: fmt(sat), sundayStr: fmt(sun) });
+                curr.setDate(curr.getDate() + 7);
+            }
+            return list;
+        }
+
+        function refreshUI() {
+            populateUserSelector();
+            updateProfileUI();
+            renderVolunteersLearningSummary();
+            renderScheduleCards();
+            if (isManagerMode) renderManagerBoard();
+            renderMasterRoster();
+        }
+
+        function populateUserSelector() {
+            const select = document.getElementById('profile-user-select'), display = document.getElementById('current-user-display');
+            if (!select) return;
+            select.innerHTML = volunteers.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+            if (activeUserId) select.value = activeUserId;
+            const curr = volunteers.find(v => v.id === activeUserId);
+            if (display) display.textContent = curr ? curr.name : '義工';
+        }
+
+        function switchCurrentUser(id) { activeUserId = id; populateUserSelector(); updateProfileUI(); renderScheduleCards(); }
+
+        function updateProfileUI() {
+            const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
+            document.getElementById('profile-name').value = u.name || '';
+            document.getElementById('profile-contact').value = u.contact || '';
+            document.getElementById('profile-learning').value = u.learning || '';
+            document.getElementById('role-lighting').checked = u.roles.includes('燈光');
+            document.getElementById('role-vj').checked = u.roles.includes('VJ');
+            document.getElementById('role-ppr').checked = u.roles.includes('PPR');
+            document.getElementById('role-sm').checked = u.roles.includes('舞監');
+        }
+
+        function saveProfile() {
+            const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
+            u.name = document.getElementById('profile-name').value.trim() || u.name;
+            u.contact = document.getElementById('profile-contact').value.trim();
+            u.learning = document.getElementById('profile-learning').value.trim();
+            const r = [];
+            if (document.getElementById('role-lighting').checked) r.push('燈光');
+            if (document.getElementById('role-vj').checked) r.push('VJ');
+            if (document.getElementById('role-ppr').checked) r.push('PPR');
+            if (document.getElementById('role-sm').checked) r.push('舞監');
+            u.roles = r;
+            syncToSupabase(); refreshUI(); showToast("資料已儲存！");
+        }
+
+        function addNewVolunteerPrompt() {
+            const name = prompt("輸入義工姓名：");
+            if (!name) return;
+            const newV = { id: 'v_' + Date.now(), name: name.trim(), contact: '', learning: '', roles: ['燈光'] };
+            volunteers.push(newV); activeUserId = newV.id;
+            syncToSupabase(); refreshUI(); showToast(`新增：${name}`);
+        }
+
+        function deleteVolunteer(volId, volName) {
+            if (!isManagerMode) {
+                alert("只有管理者模式可以移除義工！");
+                return;
+            }
+            if (volunteers.length <= 1) {
+                alert("至少需要保留一位義工！");
+                return;
+            }
+            if (!confirm(`確定要刪除義工「${volName}」嗎？此動作將同步移除其排班紀錄。`)) return;
+
+            volunteers = volunteers.filter(v => v.id !== volId);
+
+            Object.keys(rosters).forEach(rKey => {
+                ROLES.forEach(r => {
+                    if (rosters[rKey] && rosters[rKey][r] === volId) {
+                        delete rosters[rKey][r];
+                    }
+                });
+            });
+
+            if (activeUserId === volId) {
+                activeUserId = volunteers[0]?.id || '';
+            }
+
+            syncToSupabase();
+            refreshUI();
+            showToast(`已移除義工：${volName}`);
+        }
+
+        function autoGenerateRoster() {
+            if (!confirm("確定要自動生成智慧排班嗎？這將覆蓋現有的排班！")) return;
+
+            let roleCounts = {};
+            volunteers.forEach(v => roleCounts[v.id] = 0);
+
+            weekendDates.forEach(w => {
+                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                sess.forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`;
+                    rosters[rKey] = {};
+
+                    ROLES.forEach(r => {
+                        const candidates = volunteers.filter(v => v.roles.includes(r));
+                        if (candidates.length > 0) {
+                            candidates.sort((a, b) => (roleCounts[a.id] || 0) - (roleCounts[b.id] || 0));
+                            const chosen = candidates[0];
+                            rosters[rKey][r] = chosen.id;
+                            roleCounts[chosen.id] = (roleCounts[chosen.id] || 0) + 1;
+                        }
+                    });
+                });
+            });
+
+            syncToSupabase();
+            refreshUI();
+            showToast("已完成自動智慧排班！");
+        }
+
+        function renderVolunteersLearningSummary() {
+            const container = document.getElementById('volunteers-learning-summary'); if (!container) return;
+            container.innerHTML = volunteers.map(v => `
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 font-bold">
+                            <span class="text-slate-800">${v.name}</span>
+                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">${v.roles.join(', ') || '無崗位'}</span>
+                        </div>
+                        <div class="text-[11px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded mt-1 truncate">${v.learning || '無特別註記'}</div>
+                    </div>
+                    ${isManagerMode ? `
+                        <button onclick="deleteVolunteer('${v.id}', '${v.name}')" class="px-2.5 py-1 text-xs text-red-600 hover:bg-red-50 border border-red-200 rounded-lg font-semibold shrink-0 transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> 移除
+                        </button>
+                    ` : ''}
+                </div>`).join('');
+        }
+
+        function renderScheduleCards() {
+            const container = document.getElementById('schedule-cards-list'); if (!container) return;
+            container.innerHTML = '';
+            weekendDates.forEach(w => {
+                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                sess.forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    let isMine = ROLES.some(r => rosterData[r] === activeUserId);
+                    if (scheduleFilter === 'mine' && !isMine) return;
+
+                    let grid = ROLES.map(r => {
+                        const v = volunteers.find(vol => vol.id === rosterData[r]);
+                        return `<div class="p-2 rounded-xl bg-slate-50 border flex justify-between text-xs"><span class="text-slate-500">${r}</span><span class="font-bold">${v ? v.name : '待補充'}</span></div>`;
+                    }).join('');
+
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl border p-3.5 space-y-2 shadow-sm";
+                    card.innerHTML = `<div class="font-bold text-xs border-b pb-1 text-slate-800"><i class="fa-solid fa-clock text-emerald-600"></i> ${item.d} ${item.s.name}</div><div class="grid grid-cols-2 gap-2">${grid}</div>`;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function filterScheduleView(f) {
+            scheduleFilter = f;
+            document.getElementById('filter-all-btn').className = f === 'all' ? "px-2.5 py-1 rounded-md bg-white font-bold" : "px-2.5 py-1 text-slate-600";
+            document.getElementById('filter-mine-btn').className = f === 'mine' ? "px-2.5 py-1 rounded-md bg-white font-bold" : "px-2.5 py-1 text-slate-600";
+            renderScheduleCards();
+        }
+
+        function switchTab(tab) {
+            ['rules', 'schedule', 'profile', 'manager', 'admin'].forEach(t => {
+                document.getElementById(`tab-${t}`)?.classList.add('hidden');
+                document.getElementById(`nav-${t}`)?.classList.replace('text-emerald-600', 'text-slate-400');
+            });
+            document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
+            document.getElementById(`nav-${tab}`)?.classList.replace('text-slate-400', 'text-emerald-600');
+            if (tab === 'manager') renderManagerBoard();
+        }
+
+        function toggleManagerModePrompt() {
+            if (isManagerMode) {
+                isManagerMode = false;
+                document.getElementById('role-mode-text').textContent = "一般義工模式";
+                document.getElementById('manager-control-box').classList.add('hidden');
+                document.getElementById('nav-manager').classList.add('hidden');
+                switchTab('rules');
+                refreshUI();
+            } else { document.getElementById('password-modal').classList.remove('hidden'); }
+        }
+
+        function verifyManagerPassword() {
+            if (document.getElementById('manager-password-input').value === managerPassword) {
+                isManagerMode = true;
+                document.getElementById('password-modal').classList.add('hidden');
+                document.getElementById('role-mode-text').textContent = "管理者模式";
+                document.getElementById('manager-control-box').classList.remove('hidden');
+                document.getElementById('nav-manager').classList.remove('hidden');
+                switchTab('manager'); showToast("已進入管理模式");
+                refreshUI();
+            } else { document.getElementById('password-error').classList.remove('hidden'); }
+        }
+
+        function closePasswordModal() { document.getElementById('password-modal').classList.add('hidden'); }
+
+        function renderManagerBoard() {
+            const select = document.getElementById('manager-week-selector'), container = document.getElementById('manager-board-container');
+            if (!container) return;
+            if (select.children.length === 0) select.innerHTML = weekendDates.map(w => `<option value="${w.id}">${w.label}</option>`).join('');
+            const week = weekendDates.find(w => w.id === parseInt(select.value || "1")) || weekendDates[0];
+            container.innerHTML = '';
+            const sess = [{ d: week.saturdayStr, s: SESSIONS[0] }, { d: week.sundayStr, s: SESSIONS[1] }, { d: week.sundayStr, s: SESSIONS[2] }];
+
+            sess.forEach(item => {
+                const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                let html = ROLES.map(r => `
+                    <div class="flex items-center justify-between p-2 bg-slate-50 border rounded-xl text-xs">
+                        <span class="font-bold text-slate-700">${r}</span>
+                        <select onchange="updateRosterAssignment('${rKey}', '${r}', this.value)" class="bg-white border rounded p-1">
+                            <option value="">-- 未指派 --</option>
+                            ${volunteers.map(v => `<option value="${v.id}" ${rosterData[r] === v.id ? 'selected' : ''}>${v.name}</option>`).join('')}
+                        </select>
+                    </div>`).join('');
+                const box = document.createElement('div');
+                box.className = "bg-white rounded-2xl border p-3.5 space-y-2 shadow-sm";
+                box.innerHTML = `<div class="font-bold text-xs border-b pb-1 text-slate-800">${item.d} ${item.s.name}</div><div class="space-y-1.5">${html}</div>`;
+                container.appendChild(box);
+            });
+        }
+
+        function updateRosterAssignment(rKey, role, volId) {
+            if (!rosters[rKey]) rosters[rKey] = {};
+            if (volId) rosters[rKey][role] = volId; else delete rosters[rKey][role];
+            syncToSupabase(); renderScheduleCards(); renderMasterRoster(); showToast("排班已更動");
+        }
+
+        function clearAllRosters() {
+            if (confirm("確定要清空所有班表嗎？")) { rosters = {}; syncToSupabase(); refreshUI(); showToast("已清空"); }
+        }
+
+        function renderMasterRoster() {
+            const tbody = document.getElementById('master-roster-tbody'); if (!tbody) return;
+            tbody.innerHTML = '';
+            weekendDates.forEach(w => {
+                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                sess.forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    let tr = document.createElement('tr');
+                    let tds = `<td class="p-2 font-bold">${item.d} ${item.s.day}</td>` + ROLES.map(r => {
+                        const v = volunteers.find(vol => vol.id === rosterData[r]);
+                        return `<td class="p-2">${v ? v.name : '-'}</td>`;
+                    }).join('');
+                    tr.innerHTML = tds; tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function exportCSV() {
+            let csv = "data:text/csv;charset=utf-8,\uFEFF日期場次,燈光,VJ,PPR,舞監\n";
+            weekendDates.forEach(w => {
+                [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }].forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    csv += `"${item.d} ${item.s.name}",` + ROLES.map(r => `"${volunteers.find(v => v.id === rosterData[r])?.name || '-'}"`).join(',') + "\n";
+                });
+            });
+            const link = document.createElement("a"); link.href = encodeURI(csv); link.download = "服事輪值表.csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast("已下載 CSV");
+        }
+
+        function copyToClipboardTable() {
+            let txt = "日期場次\t燈光\tVJ\tPPR\t舞監\n";
+            weekendDates.forEach(w => {
+                [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }].forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    txt += `${item.d} ${item.s.name}\t` + ROLES.map(r => volunteers.find(v => v.id === rosterData[r])?.name || '-').join('\t') + "\n";
+                });
+            });
+            navigator.clipboard.writeText(txt).then(() => showToast("已複製表格！"));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 2000);
+        }
+
+        window.onload = function() {
+            weekendDates = generateWeekendDates();
+            loadDataFromSupabase();
+        };
+    </script>
+</body>
+</html>
