@@ -359,12 +359,55 @@
             syncToSupabase(); refreshUI(); showToast(`新增：${name}`);
         }
 
+        function deleteVolunteer(volId, volName) {
+            if (!isManagerMode) {
+                alert("只有管理者模式可以移除義工！");
+                return;
+            }
+            if (volunteers.length <= 1) {
+                alert("至少需要保留一位義工！");
+                return;
+            }
+            if (!confirm(`確定要刪除義工「${volName}」嗎？此動作將同步移除其排班紀錄。`)) return;
+
+            // 1. 從義工清單移除
+            volunteers = volunteers.filter(v => v.id !== volId);
+
+            // 2. 清理排班表中該義工的指派
+            Object.keys(rosters).forEach(rKey => {
+                ROLES.forEach(r => {
+                    if (rosters[rKey] && rosters[rKey][r] === volId) {
+                        delete rosters[rKey][r];
+                    }
+                });
+            });
+
+            // 3. 重置當前切換使用者
+            if (activeUserId === volId) {
+                activeUserId = volunteers[0]?.id || '';
+            }
+
+            syncToSupabase();
+            refreshUI();
+            showToast(`已移除義工：${volName}`);
+        }
+
         function renderVolunteersLearningSummary() {
             const container = document.getElementById('volunteers-learning-summary'); if (!container) return;
             container.innerHTML = volunteers.map(v => `
-                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200">
-                    <div class="flex justify-between font-bold"><span>${v.name}</span><span class="text-[10px] text-emerald-600">${v.roles.join(', ') || '無崗位'}</span></div>
-                    <div class="text-[11px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded mt-1">${v.learning || '無特別註記'}</div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 font-bold">
+                            <span class="text-slate-800">${v.name}</span>
+                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">${v.roles.join(', ') || '無崗位'}</span>
+                        </div>
+                        <div class="text-[11px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded mt-1 truncate">${v.learning || '無特別註記'}</div>
+                    </div>
+                    ${isManagerMode ? `
+                        <button onclick="deleteVolunteer('${v.id}', '${v.name}')" class="px-2.5 py-1 text-xs text-red-600 hover:bg-red-50 border border-red-200 rounded-lg font-semibold shrink-0 transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> 移除
+                        </button>
+                    ` : ''}
                 </div>`).join('');
         }
 
@@ -415,6 +458,7 @@
                 document.getElementById('manager-control-box').classList.add('hidden');
                 document.getElementById('nav-manager').classList.add('hidden');
                 switchTab('rules');
+                refreshUI();
             } else { document.getElementById('password-modal').classList.remove('hidden'); }
         }
 
@@ -426,6 +470,7 @@
                 document.getElementById('manager-control-box').classList.remove('hidden');
                 document.getElementById('nav-manager').classList.remove('hidden');
                 switchTab('manager'); showToast("已進入管理模式");
+                refreshUI();
             } else { document.getElementById('password-error').classList.remove('hidden'); }
         }
 
