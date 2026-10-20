@@ -15,7 +15,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-24">
 
-    <!-- Top App Header -->
+    <!-- Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
@@ -37,10 +37,10 @@
         </div>
     </header>
 
-    <!-- Main Mobile Container -->
+    <!-- Main Content Container -->
     <main class="max-w-md mx-auto w-full px-4 pt-4 flex-1">
 
-        <!-- Active User Selector Bar -->
+        <!-- Active User Selector -->
         <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm mb-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-circle-user text-emerald-600 text-lg"></i>
@@ -198,7 +198,7 @@
         </section>
     </main>
 
-    <!-- Navigation Bar -->
+    <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
         <div class="max-w-md mx-auto flex justify-around py-1.5">
             <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1.5 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
@@ -238,7 +238,7 @@
             if (window.supabase?.createClient) {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
-        } catch (e) { console.warn("Supabase 初始化跳過", e); }
+        } catch (e) { console.warn("Supabase 跳過", e); }
 
         const ROLES = ['燈光', 'VJ', 'PPR', '舞監'];
         const SESSIONS = [
@@ -261,12 +261,12 @@
         async function loadDataFromSupabase() {
             if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); loadFromLocal(); return; }
             try {
-                const { data, error } = await supabaseClient.from('roster_data').select('content').eq('id', 'main_store').maybeSingle();
-                if (data && data.content) {
+                const { data } = await supabaseClient.from('roster_data').select('content').eq('id', 'main_store').maybeSingle();
+                if (data?.content) {
                     volunteers = data.content.volunteers || volunteers;
                     rosters = data.content.rosters || {};
                     managerPassword = data.content.managerPassword || managerPassword;
-                    updateSyncStatus(true, "已連線 Supabase");
+                    updateSyncStatus(true, "已同步 Supabase");
                 } else { await syncToSupabase(); }
             } catch (err) { loadFromLocal(); }
             refreshUI();
@@ -277,7 +277,7 @@
             localStorage.setItem('church_rosters', JSON.stringify(rosters));
             if (!supabaseClient) return;
             const { error } = await supabaseClient.from('roster_data').upsert({ id: 'main_store', content: { volunteers, rosters, managerPassword } });
-            updateSyncStatus(!error, error ? "請建立 Supabase 資料表" : "已同步 Supabase");
+            updateSyncStatus(!error, error ? "連線錯誤" : "已同步 Supabase");
         }
 
         function loadFromLocal() {
