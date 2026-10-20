@@ -3,42 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教會服事輪值與智慧排班系統 (Supabase 版)</title>
-    <!-- Tailwind CSS -->
+    <title>教會服事智慧排班系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Supabase JS SDK v2 (相容 Publishable key) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body { -webkit-tap-highlight-color: transparent; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col pb-24">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-24">
 
     <!-- Top App Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
@@ -55,14 +30,10 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Profile & Role View Switcher -->
-            <div class="flex items-center gap-1.5">
-                <button id="role-mode-btn" onclick="toggleManagerModePrompt()" class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition flex items-center gap-1">
-                    <i id="role-mode-icon" class="fa-solid fa-user text-slate-500"></i>
-                    <span id="role-mode-text">一般義工模式</span>
-                </button>
-            </div>
+            <button id="role-mode-btn" onclick="toggleManagerModePrompt()" class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition flex items-center gap-1">
+                <i id="role-mode-icon" class="fa-solid fa-user text-slate-500"></i>
+                <span id="role-mode-text">一般義工模式</span>
+            </button>
         </div>
     </header>
 
@@ -83,494 +54,254 @@
             </button>
         </div>
 
-        <!-- TAB 1: SERVICE GUIDELINES & RULES -->
+        <!-- TAB 1: RULES -->
         <section id="tab-rules" class="space-y-4">
             <div class="bg-gradient-to-br from-emerald-700 to-teal-800 text-white p-4 rounded-2xl shadow-md space-y-2">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-book-bookmark text-amber-300 text-lg"></i>
                     <h2 class="font-bold text-base">聚管組服事規範與注意事項</h2>
                 </div>
-                <p class="text-xs text-emerald-100 leading-relaxed">
-                    感謝同工忠心的擺上與陪伴！請留意各堂聚會預備時間與請假規範，共同維持高品質的聚會服事。
-                </p>
+                <p class="text-xs text-emerald-100 leading-relaxed">感謝同工忠心擺上！請留意各堂聚會預備時間與請假規範。</p>
             </div>
 
-            <!-- Schedule & Prep Times Section -->
             <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
                 <div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">
                     <i class="fa-solid fa-clock text-emerald-600 text-base"></i>
                     <h3 class="text-xs font-bold text-slate-800">各堂聚會預備、彩排與禱告時間</h3>
                 </div>
-
                 <div class="space-y-2.5 text-xs">
-                    <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-1">
-                        <div class="font-bold text-emerald-700 flex items-center gap-1.5">
-                            <i class="fa-solid fa-moon text-amber-500"></i> 週六晚堂
-                        </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-1">
+                        <div class="font-bold text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-moon text-amber-500"></i> 週六晚堂</div>
                         <ul class="space-y-1 text-slate-700 pl-4 list-disc">
-                            <li><span class="font-semibold text-slate-900">17:20</span> 聚管組預備跟綵排</li>
-                            <li><span class="font-semibold text-slate-900">18:20–18:35</span> 服事人員聚集禱告 + 對 Rundown</li>
+                            <li><b>17:20</b> 聚管組預備跟綵排</li>
+                            <li><b>18:20–18:35</b> 服事人員聚集禱告 + 對 Rundown</li>
                         </ul>
                     </div>
-
-                    <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-1">
-                        <div class="font-bold text-emerald-700 flex items-center gap-1.5">
-                            <i class="fa-solid fa-sun text-amber-500"></i> 週日早堂
-                        </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-1">
+                        <div class="font-bold text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-sun text-amber-500"></i> 週日早堂</div>
                         <ul class="space-y-1 text-slate-700 pl-4 list-disc">
-                            <li><span class="font-semibold text-slate-900">08:00</span> 聚管組預備跟綵排</li>
-                            <li><span class="font-semibold text-slate-900">08:50–09:05</span> 服事人員聚集禱告 + 對 Rundown</li>
+                            <li><b>08:00</b> 聚管組預備跟綵排</li>
+                            <li><b>08:50–09:05</b> 服事人員聚集禱告 + 對 Rundown</li>
                         </ul>
                     </div>
-
-                    <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-1">
-                        <div class="font-bold text-emerald-700 flex items-center gap-1.5">
-                            <i class="fa-solid fa-cloud-sun text-amber-500"></i> 週日午堂
-                        </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-1">
+                        <div class="font-bold text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-cloud-sun text-amber-500"></i> 週日午堂</div>
                         <ul class="space-y-1 text-slate-700 pl-4 list-disc">
-                            <li><span class="font-semibold text-slate-900">12:50</span> 聚管組預備跟綵排</li>
-                            <li><span class="font-semibold text-slate-900">13:20–13:35</span> 服事人員聚集禱告 + 對 Rundown</li>
+                            <li><b>12:50</b> 聚管組預備跟綵排</li>
+                            <li><b>13:20–13:35</b> 服事人員聚集禱告 + 對 Rundown</li>
                         </ul>
                     </div>
                 </div>
-
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 flex items-start gap-2.5">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-sm mt-0.5"></i>
-                    <div class="text-xs leading-relaxed font-medium">
-                        <span class="font-bold text-amber-800">重要提醒：</span>彩排結束後的服事人員禱告與對 Rundown 為 <span class="text-red-600 font-bold underline">全員參加</span>。
-                    </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 flex items-start gap-2 text-xs">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5"></i>
+                    <div><span class="font-bold">重要提醒：</span>彩排結束後的服事人員禱告與對 Rundown 為 <span class="text-red-600 font-bold underline">全員參加</span>。</div>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 2: SCHEDULE & ROSTER -->
+        <!-- TAB 2: SCHEDULE -->
         <section id="tab-schedule" class="space-y-4 hidden">
-            <div id="manager-control-box" class="bg-gradient-to-br from-teal-900 to-slate-900 text-white rounded-2xl p-4 shadow-xl space-y-3 hidden">
-                <div class="flex items-center justify-between border-b border-teal-700/50 pb-2">
-                    <div class="flex items-center gap-2 font-bold text-sm">
-                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-base"></i> 智慧排班管理中心
-                    </div>
+            <div id="manager-control-box" class="bg-slate-900 text-white rounded-2xl p-4 shadow-xl space-y-3 hidden">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                    <div class="font-bold text-sm text-amber-400"><i class="fa-solid fa-wand-magic-sparkles"></i> 管理控制面板</div>
                 </div>
-
-                <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div class="bg-teal-950/60 p-2 rounded-xl border border-teal-800">
-                        <span class="text-teal-300 text-[10px] block">總排班場次</span>
-                        <span id="stat-total-sessions" class="font-bold text-sm text-white">0</span>
-                    </div>
-                    <div class="bg-teal-950/60 p-2 rounded-xl border border-teal-800">
-                        <span class="text-teal-300 text-[10px] block">排班完成率</span>
-                        <span id="stat-fill-rate" class="font-bold text-sm text-emerald-400">0%</span>
-                    </div>
-                    <div class="bg-teal-950/60 p-2 rounded-xl border border-teal-800">
-                        <span class="text-teal-300 text-[10px] block">待補充崗位</span>
-                        <span id="stat-missing-roles" class="font-bold text-sm text-amber-400">0</span>
-                    </div>
-                </div>
-
-                <div class="pt-1 flex gap-2">
-                    <button onclick="clearAllRosters()" class="w-full bg-teal-950 hover:bg-red-900 text-teal-200 hover:text-white border border-teal-700 font-semibold py-2.5 rounded-xl text-xs transition">
-                        清空班表
-                    </button>
-                </div>
+                <button onclick="clearAllRosters()" class="w-full bg-red-900/80 hover:bg-red-800 text-white py-2 rounded-xl text-xs font-semibold">清空班表</button>
             </div>
-
-            <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-3 flex items-start gap-2.5 text-amber-900 shadow-sm">
-                <i class="fa-solid fa-bell text-amber-600 text-sm mt-0.5"></i>
-                <div class="text-xs leading-relaxed">
-                    若您當週無法服事，請與管理者聯繫調整班表。
-                </div>
-            </div>
-
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-check text-emerald-600"></i> 服事輪值表
-                </h2>
-                <div class="flex bg-slate-200/80 p-0.5 rounded-lg text-[11px] font-medium">
-                    <button id="filter-all-btn" onclick="filterScheduleView('all')" class="px-2.5 py-1 rounded-md bg-white text-slate-800 shadow-sm transition font-bold">全部場次</button>
-                    <button id="filter-mine-btn" onclick="filterScheduleView('mine')" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition">只看我的班</button>
+                <h2 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-calendar-check text-emerald-600"></i> 服事輪值表</h2>
+                <div class="flex bg-slate-200 p-0.5 rounded-lg text-[11px]">
+                    <button id="filter-all-btn" onclick="filterScheduleView('all')" class="px-2.5 py-1 rounded-md bg-white font-bold">全部場次</button>
+                    <button id="filter-mine-btn" onclick="filterScheduleView('mine')" class="px-2.5 py-1 rounded-md text-slate-600">只看我的班</button>
                 </div>
             </div>
-
             <div id="schedule-cards-list" class="space-y-3.5"></div>
         </section>
 
-        <!-- TAB 3: PROFILE & VOLUNTEERS -->
+        <!-- TAB 3: PROFILE -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
-                <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
-                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-bold">
-                        <i class="fa-solid fa-id-card"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base font-bold text-slate-800">義工個人、技能與學習狀態</h2>
-                        <p class="text-xs text-slate-500">選擇您的身分或編輯學習進度</p>
-                    </div>
-                </div>
-
+                <h2 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-2">義工設定與個人進度</h2>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">選擇或切換目前登入義工</label>
-                    <select id="profile-user-select" onchange="switchCurrentUser(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"></select>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">切換目前登入義工</label>
+                    <select id="profile-user-select" onchange="switchCurrentUser(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm"></select>
                 </div>
-
-                <hr class="border-slate-100">
-
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">義工姓名 / 暱稱 <span class="text-red-500">*</span></label>
-                        <input type="text" id="profile-name" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">義工姓名</label>
+                        <input type="text" id="profile-name" class="w-full border border-slate-300 rounded-xl p-2 text-sm">
                     </div>
-
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Line ID / 聯絡電話</label>
-                        <input type="text" id="profile-contact" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="例：line_id / 0912-345678">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">聯絡電話 / Line ID</label>
+                        <input type="text" id="profile-contact" class="w-full border border-slate-300 rounded-xl p-2 text-sm">
                     </div>
-
-                    <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 space-y-1.5">
-                        <label class="block text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                            <i class="fa-solid fa-graduation-cap text-amber-600"></i> 目前學習 / 培訓中的項目 (學習進度)
-                        </label>
-                        <input type="text" id="profile-learning" class="w-full bg-white border border-amber-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="例如：正在練習燈光切換...">
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                        <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-graduation-cap"></i> 目前學習/培訓項目</label>
+                        <input type="text" id="profile-learning" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs">
                     </div>
-
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任之服事崗位 (可複選)</label>
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 cursor-pointer transition">
-                                <input type="checkbox" id="role-lighting" value="燈光" class="w-4 h-4 text-emerald-600 rounded border-slate-300">
-                                <span class="text-xs font-medium text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-lightbulb text-amber-500"></i> 燈光</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 cursor-pointer transition">
-                                <input type="checkbox" id="role-vj" value="VJ" class="w-4 h-4 text-emerald-600 rounded border-slate-300">
-                                <span class="text-xs font-medium text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-desktop text-purple-500"></i> VJ</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 cursor-pointer transition">
-                                <input type="checkbox" id="role-ppr" value="PPR" class="w-4 h-4 text-emerald-600 rounded border-slate-300">
-                                <span class="text-xs font-medium text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-sliders text-blue-500"></i> PPR</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 cursor-pointer transition">
-                                <input type="checkbox" id="role-sm" value="舞監" class="w-4 h-4 text-emerald-600 rounded border-slate-300">
-                                <span class="text-xs font-medium text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-user-ninja text-emerald-500"></i> 舞監</span>
-                            </label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任崗位 (可複選)</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-lighting" value="燈光"> 燈光</label>
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-vj" value="VJ"> VJ</label>
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-ppr" value="PPR"> PPR</label>
+                            <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-sm" value="舞監"> 舞監</label>
                         </div>
                     </div>
                 </div>
-
-                <div class="pt-2 flex gap-2">
-                    <button onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-md">
-                        更新個人技能與學習項目
-                    </button>
-                    <button onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200 transition">
-                        <i class="fa-solid fa-plus"></i> 新增義工
-                    </button>
+                <div class="flex gap-2">
+                    <button onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">更新資料</button>
+                    <button onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200">新增義工</button>
                 </div>
             </div>
-
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                    <i class="fa-solid fa-users text-emerald-600"></i> 全員義工學習進度總覽
-                </h3>
+                <h3 class="text-xs font-bold text-slate-800 border-b border-slate-100 pb-2"><i class="fa-solid fa-users text-emerald-600"></i> 全員義工學習進度總覽</h3>
                 <div id="volunteers-learning-summary" class="space-y-2 text-xs"></div>
             </div>
         </section>
 
-        <!-- TAB 4: MANAGER MANUAL SCHEDULER BOARD -->
+        <!-- TAB 4: MANAGER WORKSTATION -->
         <section id="tab-manager" class="space-y-4 hidden">
-            <div class="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white p-4 rounded-2xl shadow-md space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-amber-400 text-lg"></i>
-                        <h2 class="font-bold text-sm">管理者手動排班工作台</h2>
-                    </div>
-                    <span class="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-bold px-2 py-0.5 rounded-full">管理權限生效中</span>
-                </div>
-                <div class="flex gap-2 pt-1">
-                    <button onclick="clearAllRosters()" class="w-full bg-red-900/60 hover:bg-red-800 text-red-100 border border-red-700/50 font-semibold py-2 rounded-xl text-xs transition">
-                        清空重新排
-                    </button>
-                </div>
+            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md flex items-center justify-between">
+                <span class="font-bold text-sm"><i class="fa-solid fa-sliders text-amber-400"></i> 管理者手動排班工作台</span>
+                <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">管理模式</span>
             </div>
-
-            <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
-                <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <i class="fa-solid fa-filter text-emerald-600"></i> 選擇欲排班的週末：
-                </label>
-                <select id="manager-week-selector" onchange="renderManagerBoard()" class="bg-slate-50 border border-slate-300 rounded-lg text-xs p-1.5 font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"></select>
+            <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between text-xs font-bold">
+                <label>選擇排班週末：</label>
+                <select id="manager-week-selector" onchange="renderManagerBoard()" class="bg-slate-50 border border-slate-300 rounded-lg p-1.5"></select>
             </div>
-
             <div id="manager-board-container" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 5: MASTER ROSTER & EXPORT -->
+        <!-- TAB 5: MASTER ROSTER -->
         <section id="tab-admin" class="space-y-4 hidden">
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 space-y-2.5">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2 font-bold text-sm">
-                        <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i> Google Sheets / CSV 匯出
-                    </div>
-                    <span class="text-[10px] bg-emerald-200/80 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Supabase 即時同步</span>
-                </div>
-                <div class="flex gap-2 pt-1">
-                    <button onclick="exportCSV()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
-                        <i class="fa-solid fa-download"></i> 下載 CSV 檔
-                    </button>
-                    <button onclick="copyToClipboardTable()" class="flex-1 bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition">
-                        <i class="fa-solid fa-copy"></i> 複製貼上至 Google Sheet
-                    </button>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 space-y-2">
+                <div class="font-bold text-sm"><i class="fa-solid fa-file-excel"></i> 排班總表匯出</div>
+                <div class="flex gap-2">
+                    <button onclick="exportCSV()" class="flex-1 bg-emerald-600 text-white py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-download"></i> 下載 CSV</button>
+                    <button onclick="copyToClipboardTable()" class="flex-1 bg-white text-emerald-800 border border-emerald-300 py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-copy"></i> 複製表格</button>
                 </div>
             </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <h3 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <i class="fa-solid fa-table-list text-emerald-600"></i> 全員服事排班總表
-                    </h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
-                        <thead class="bg-slate-100/80 text-slate-500 font-medium border-b border-slate-200">
-                            <tr>
-                                <th class="p-2.5 whitespace-nowrap">日期場次</th>
-                                <th class="p-2.5 whitespace-nowrap">💡 燈光</th>
-                                <th class="p-2.5 whitespace-nowrap">🖥️ VJ</th>
-                                <th class="p-2.5 whitespace-nowrap">🎛️ PPR</th>
-                                <th class="p-2.5 whitespace-nowrap">🎬 舞監</th>
-                            </tr>
-                        </thead>
-                        <tbody id="master-roster-tbody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto shadow-sm">
+                <table class="w-full text-left text-xs text-slate-700">
+                    <thead class="bg-slate-100 font-medium border-b border-slate-200">
+                        <tr>
+                            <th class="p-2.5">日期場次</th>
+                            <th class="p-2.5">💡 燈光</th>
+                            <th class="p-2.5">🖥️ VJ</th>
+                            <th class="p-2.5">🎛️ PPR</th>
+                            <th class="p-2.5">🎬 舞監</th>
+                        </tr>
+                    </thead>
+                    <tbody id="master-roster-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Navigation Bar -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
-        <div class="max-w-md mx-auto flex items-center justify-around py-1.5">
-            <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1.5 text-emerald-600 font-semibold transition">
-                <i class="fa-solid fa-book-bookmark text-base mb-0.5"></i>
-                <span class="text-[10px]">服事規範</span>
-            </button>
-            <button id="nav-schedule" onclick="switchTab('schedule')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 font-medium transition">
-                <i class="fa-solid fa-calendar-days text-base mb-0.5"></i>
-                <span class="text-[10px]">輪值表</span>
-            </button>
-            <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 font-medium transition hidden">
-                <i class="fa-solid fa-sliders text-base mb-0.5"></i>
-                <span class="text-[10px]">手動排班</span>
-            </button>
-            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 font-medium transition">
-                <i class="fa-solid fa-user text-base mb-0.5"></i>
-                <span class="text-[10px]">義工設定</span>
-            </button>
-            <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 font-medium transition">
-                <i class="fa-solid fa-file-export text-base mb-0.5"></i>
-                <span class="text-[10px]">總表</span>
-            </button>
+        <div class="max-w-md mx-auto flex justify-around py-1.5">
+            <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1.5 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
+            <button id="nav-schedule" onclick="switchTab('schedule')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-base mb-0.5"></i><span class="text-[10px]">輪值表</span></button>
+            <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium hidden"><i class="fa-solid fa-sliders text-base mb-0.5"></i><span class="text-[10px]">手動排班</span></button>
+            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-user text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
+            <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-file-export text-base mb-0.5"></i><span class="text-[10px]">總表</span></button>
         </div>
     </nav>
 
-    <!-- Modal: Manager Password Prompt -->
+    <!-- Modal: Password -->
     <div id="password-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-xs w-full p-5 space-y-4 shadow-2xl border border-slate-100">
-            <div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">
-                <i class="fa-solid fa-lock text-emerald-600"></i>
-                <h3 class="font-bold text-sm text-slate-900">管理者身分驗證</h3>
+        <div class="bg-white rounded-2xl max-w-xs w-full p-5 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-sm text-slate-900 border-b pb-2"><i class="fa-solid fa-lock text-emerald-600"></i> 管理者驗證</h3>
+            <div>
+                <input type="password" id="manager-password-input" class="w-full border rounded-xl p-2 text-sm text-center font-mono" placeholder="****">
+                <p id="password-error" class="text-[11px] text-red-500 mt-1 hidden">密碼錯誤！</p>
             </div>
-            <div class="space-y-2">
-                <label class="block text-xs font-semibold text-slate-700">請輸入管理密碼：</label>
-                <input type="password" id="manager-password-input" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm text-center font-mono tracking-widest focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="****">
-                <p id="password-error" class="text-[11px] text-red-500 font-medium hidden">密碼錯誤，請重新輸入！</p>
-            </div>
-            <div class="flex gap-2 pt-1">
-                <button onclick="closePasswordModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 rounded-xl text-xs transition">取消</button>
-                <button onclick="verifyManagerPassword()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-xl text-xs shadow-md transition">確認登入</button>
+            <div class="flex gap-2">
+                <button onclick="closePasswordModal()" class="flex-1 bg-slate-100 py-2 rounded-xl text-xs font-semibold">取消</button>
+                <button onclick="verifyManagerPassword()" class="flex-1 bg-emerald-600 text-white py-2 rounded-xl text-xs font-semibold">確認</button>
             </div>
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-xl z-50 transition-all duration-300 opacity-0 pointer-events-none flex items-center gap-2">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toast-message">操作成功</span>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-full text-xs z-50 transition duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i><span id="toast-message">操作成功</span>
     </div>
 
     <script>
-        // ========================================================
-        // ⚡ SUPABASE 設定
-        // ========================================================
         const SUPABASE_URL = "https://ootvyczagfdigjzmnmky.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_JkHsNecihT-uodpgF809eg_Nyyf2Yhq";
 
         let supabaseClient = null;
         try {
-            const createClientFn = window.supabase?.createClient || window.supabaseClient?.createClient;
-            if (typeof createClientFn === 'function') {
-                supabaseClient = createClientFn(SUPABASE_URL, SUPABASE_ANON_KEY);
+            if (window.supabase?.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
-        } catch (e) {
-            console.warn("Supabase SDK 初始化失敗，切換為區域暫存模式:", e);
-        }
+        } catch (e) { console.warn("Supabase 初始化跳過", e); }
 
-        // 常數與資料狀態
         const ROLES = ['燈光', 'VJ', 'PPR', '舞監'];
         const SESSIONS = [
-            { key: 'Sat_1900', name: '週六 19:00 (晚聚會)', day: 'Sat', time: '19:00' },
-            { key: 'Sun_0930', name: '週日 09:30 (早聚會)', day: 'Sun', time: '09:30' },
-            { key: 'Sun_1400', name: '週日 14:00 (午聚會)', day: 'Sun', time: '14:00' }
+            { key: 'Sat_1900', name: '週六 19:00', day: 'Sat' },
+            { key: 'Sun_0930', name: '週日 09:30', day: 'Sun' },
+            { key: 'Sun_1400', name: '週日 14:00', day: 'Sun' }
         ];
 
-        let isManagerMode = false;
-        let managerPassword = "1234";
-        let activeUserId = "v1";
-
+        let isManagerMode = false, managerPassword = "1234", activeUserId = "v1";
         let volunteers = [
             { id: 'v1', name: '子祈', contact: '', roles: ['燈光', 'VJ'], learning: '' },
             { id: 'v2', name: 'Joshua', contact: '', roles: ['PPR', '舞監'], learning: '' },
             { id: 'v3', name: '宥安', contact: '', roles: ['燈光'], learning: '' },
             { id: 'v4', name: '凱欣', contact: '', roles: ['VJ'], learning: '' },
             { id: 'v5', name: '捷飛', contact: '', roles: ['PPR'], learning: '' },
-            { id: 'v6', name: '紀宏', contact: '', roles: ['舞監'], learning: '' },
-            { id: 'v7', name: '安蓁', contact: '', roles: ['燈光'], learning: '' },
-            { id: 'v8', name: '茗莉', contact: '', roles: ['VJ'], learning: '' },
-            { id: 'v9', name: '宣右', contact: '', roles: ['PPR'], learning: '' },
-            { id: 'v10', name: '穎吟', contact: '', roles: ['舞監'], learning: '' },
-            { id: 'v11', name: '峻安', contact: '', roles: ['燈光'], learning: '' },
-            { id: 'v12', name: '依瑾', contact: '', roles: ['VJ'], learning: '' },
-            { id: 'v13', name: '佩雯', contact: '', roles: ['PPR'], learning: '' },
-            { id: 'v14', name: '微婷', contact: '', roles: ['舞監'], learning: '' },
-            { id: 'v15', name: '以柔', contact: '', roles: ['燈光'], learning: '' },
-            { id: 'v16', name: '健傑', contact: '', roles: ['VJ'], learning: '' },
-            { id: 'v17', name: '怡瑩', contact: '', roles: ['PPR'], learning: '' },
-            { id: 'v18', name: '明嬛', contact: '', roles: ['舞監'], learning: '' },
-            { id: 'v19', name: '承諭', contact: '', roles: ['燈光'], learning: '' },
-            { id: 'v20', name: '昱昕', contact: '', roles: ['VJ'], learning: '' },
-            { id: 'v21', name: '燁卿', contact: '', roles: ['PPR'], learning: '' },
-            { id: 'v22', name: '凰媜', contact: '', roles: ['舞監'], learning: '' },
-            { id: 'v23', name: '庭偉', contact: '', roles: ['燈光'], learning: '' },
-            { id: 'v24', name: '哲綸', contact: '', roles: ['VJ'], learning: '' }
+            { id: 'v6', name: '紀宏', contact: '', roles: ['舞監'], learning: '' }
         ];
+        let rosters = {}, weekendDates = [], scheduleFilter = 'all';
 
-        let availabilities = {};
-        let rosters = {};
-        let weekendDates = [];
-        let scheduleFilter = 'all';
-
-        // 讀取 Supabase 資料
         async function loadDataFromSupabase() {
-            if (!supabaseClient) {
-                updateSyncStatus(false, "暫存模式 (本機數據)");
-                loadFromLocalBackup();
-                return;
-            }
-
+            if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); loadFromLocal(); return; }
             try {
-                const { data, error } = await supabaseClient
-                    .from('roster_data')
-                    .select('content')
-                    .eq('id', 'main_store')
-                    .maybeSingle();
-
-                if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
-                    console.warn("資料表不存在:", error);
-                    updateSyncStatus(false, "請先至 Supabase 建立資料表");
-                    loadFromLocalBackup();
-                    return;
-                }
-
+                const { data, error } = await supabaseClient.from('roster_data').select('content').eq('id', 'main_store').maybeSingle();
                 if (data && data.content) {
                     volunteers = data.content.volunteers || volunteers;
-                    availabilities = data.content.availabilities || {};
                     rosters = data.content.rosters || {};
                     managerPassword = data.content.managerPassword || managerPassword;
-                    updateSyncStatus(true, "已同步 Supabase");
-                } else {
-                    await syncToSupabase();
-                }
-                refreshUI();
-            } catch (err) {
-                console.error("Supabase 連線例外:", err);
-                await syncToSupabase();
-                refreshUI();
-            }
-        }
-
-        // 寫入/同步至 Supabase
-        async function syncToSupabase() {
-            localStorage.setItem('church_vols', JSON.stringify(volunteers));
-            localStorage.setItem('church_avail', JSON.stringify(availabilities));
-            localStorage.setItem('church_rosters', JSON.stringify(rosters));
-            localStorage.setItem('church_mgr_pwd', managerPassword);
-
-            if (!supabaseClient) return;
-
-            const payload = {
-                volunteers,
-                availabilities,
-                rosters,
-                managerPassword
-            };
-
-            const { error } = await supabaseClient
-                .from('roster_data')
-                .upsert({ id: 'main_store', content: payload });
-
-            if (error) {
-                console.error("Supabase 寫入失敗:", error);
-                updateSyncStatus(false, "請至 SQL Editor 建立 roster_data 資料表");
-            } else {
-                updateSyncStatus(true, "已同步 Supabase");
-            }
-        }
-
-        function loadFromLocalBackup() {
-            const savedVols = localStorage.getItem('church_vols');
-            if (savedVols) volunteers = JSON.parse(savedVols);
-            const savedAvail = localStorage.getItem('church_avail');
-            if (savedAvail) availabilities = JSON.parse(savedAvail);
-            const savedRosters = localStorage.getItem('church_rosters');
-            if (savedRosters) rosters = JSON.parse(savedRosters);
-            const savedPwd = localStorage.getItem('church_mgr_pwd');
-            if (savedPwd) managerPassword = savedPwd;
+                    updateSyncStatus(true, "已連線 Supabase");
+                } else { await syncToSupabase(); }
+            } catch (err) { loadFromLocal(); }
             refreshUI();
         }
 
-        function updateSyncStatus(isOnline, textMsg) {
-            const dot = document.getElementById('sync-status-dot');
-            const text = document.getElementById('sync-status-text');
-            if (dot && text) {
-                dot.className = isOnline ? "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" : "w-2 h-2 rounded-full bg-amber-500";
-                text.textContent = textMsg;
-            }
+        async function syncToSupabase() {
+            localStorage.setItem('church_vols', JSON.stringify(volunteers));
+            localStorage.setItem('church_rosters', JSON.stringify(rosters));
+            if (!supabaseClient) return;
+            const { error } = await supabaseClient.from('roster_data').upsert({ id: 'main_store', content: { volunteers, rosters, managerPassword } });
+            updateSyncStatus(!error, error ? "請建立 Supabase 資料表" : "已同步 Supabase");
+        }
+
+        function loadFromLocal() {
+            const v = localStorage.getItem('church_vols'), r = localStorage.getItem('church_rosters');
+            if (v) volunteers = JSON.parse(v);
+            if (r) rosters = JSON.parse(r);
+            refreshUI();
+        }
+
+        function updateSyncStatus(online, msg) {
+            document.getElementById('sync-status-dot').className = online ? "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" : "w-2 h-2 rounded-full bg-amber-500";
+            document.getElementById('sync-status-text').textContent = msg;
         }
 
         function generateWeekendDates() {
-            const list = [];
-            const now = new Date();
-            const year = now.getFullYear();
-            const endDate = new Date(year, 11, 31);
-
+            const list = [], now = new Date(), endDate = new Date(now.getFullYear(), 11, 31);
             let curr = new Date(now);
-            while (curr.getDay() !== 6 && curr <= endDate) {
-                curr.setDate(curr.getDate() + 1);
-            }
-
-            let weekIdx = 1;
+            while (curr.getDay() !== 6 && curr <= endDate) curr.setDate(curr.getDate() + 1);
+            let idx = 1;
             while (curr <= endDate) {
-                const sat = new Date(curr);
-                const sun = new Date(curr);
-                sun.setDate(sun.getDate() + 1);
-
-                const formatDate = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
-                
-                list.push({
-                    id: weekIdx,
-                    label: `${sat.getMonth() + 1}月第 ${Math.ceil(sat.getDate() / 7)} 週`,
-                    saturdayStr: sat <= endDate ? formatDate(sat) : null,
-                    sundayStr: sun <= endDate ? formatDate(sun) : null
-                });
-
+                const sat = new Date(curr), sun = new Date(curr); sun.setDate(sun.getDate() + 1);
+                const fmt = d => `${d.getMonth() + 1}/${d.getDate()}`;
+                list.push({ id: idx++, label: `${sat.getMonth() + 1}月第 ${Math.ceil(sat.getDate() / 7)} 週`, saturdayStr: fmt(sat), sundayStr: fmt(sun) });
                 curr.setDate(curr.getDate() + 7);
-                weekIdx++;
             }
             return list;
         }
@@ -585,370 +316,207 @@
         }
 
         function populateUserSelector() {
-            const select = document.getElementById('profile-user-select');
-            const display = document.getElementById('current-user-display');
+            const select = document.getElementById('profile-user-select'), display = document.getElementById('current-user-display');
             if (!select) return;
-
-            select.innerHTML = volunteers.map(v => `<option value="${v.id}">${v.name} (${v.roles.join(', ') || '培訓中'})</option>`).join('');
-            
-            if (!volunteers.some(v => v.id === activeUserId) && volunteers.length > 0) {
-                activeUserId = volunteers[0].id;
-            }
-
+            select.innerHTML = volunteers.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
             if (activeUserId) select.value = activeUserId;
             const curr = volunteers.find(v => v.id === activeUserId);
-            if (display) display.textContent = curr ? curr.name : '未知義工';
+            if (display) display.textContent = curr ? curr.name : '義工';
         }
 
-        function switchCurrentUser(volId) {
-            activeUserId = volId;
-            populateUserSelector();
-            updateProfileUI();
-            renderScheduleCards();
-            showToast(`切換身分為：${volunteers.find(v => v.id === volId)?.name}`);
-        }
+        function switchCurrentUser(id) { activeUserId = id; populateUserSelector(); updateProfileUI(); renderScheduleCards(); }
 
         function updateProfileUI() {
-            const user = volunteers.find(v => v.id === activeUserId);
-            if (!user) return;
-
-            document.getElementById('profile-name').value = user.name || '';
-            document.getElementById('profile-contact').value = user.contact || '';
-            document.getElementById('profile-learning').value = user.learning || '';
-            
-            document.getElementById('role-lighting').checked = user.roles.includes('燈光');
-            document.getElementById('role-vj').checked = user.roles.includes('VJ');
-            document.getElementById('role-ppr').checked = user.roles.includes('PPR');
-            document.getElementById('role-sm').checked = user.roles.includes('舞監');
+            const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
+            document.getElementById('profile-name').value = u.name || '';
+            document.getElementById('profile-contact').value = u.contact || '';
+            document.getElementById('profile-learning').value = u.learning || '';
+            document.getElementById('role-lighting').checked = u.roles.includes('燈光');
+            document.getElementById('role-vj').checked = u.roles.includes('VJ');
+            document.getElementById('role-ppr').checked = u.roles.includes('PPR');
+            document.getElementById('role-sm').checked = u.roles.includes('舞監');
         }
 
         function saveProfile() {
-            const user = volunteers.find(v => v.id === activeUserId);
-            if (!user) return;
-
-            user.name = document.getElementById('profile-name').value.trim() || user.name;
-            user.contact = document.getElementById('profile-contact').value.trim();
-            user.learning = document.getElementById('profile-learning').value.trim();
-
-            const roles = [];
-            if (document.getElementById('role-lighting').checked) roles.push('燈光');
-            if (document.getElementById('role-vj').checked) roles.push('VJ');
-            if (document.getElementById('role-ppr').checked) roles.push('PPR');
-            if (document.getElementById('role-sm').checked) roles.push('舞監');
-
-            user.roles = roles;
-            syncToSupabase();
-            populateUserSelector();
-            renderVolunteersLearningSummary();
-            showToast("個人技能與學習項目已成功更新！");
+            const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
+            u.name = document.getElementById('profile-name').value.trim() || u.name;
+            u.contact = document.getElementById('profile-contact').value.trim();
+            u.learning = document.getElementById('profile-learning').value.trim();
+            const r = [];
+            if (document.getElementById('role-lighting').checked) r.push('燈光');
+            if (document.getElementById('role-vj').checked) r.push('VJ');
+            if (document.getElementById('role-ppr').checked) r.push('PPR');
+            if (document.getElementById('role-sm').checked) r.push('舞監');
+            u.roles = r;
+            syncToSupabase(); refreshUI(); showToast("資料已儲存！");
         }
 
         function addNewVolunteerPrompt() {
-            const name = prompt("請輸入新義工姓名/暱稱：");
+            const name = prompt("輸入義工姓名：");
             if (!name) return;
-
-            const newVol = {
-                id: 'v_' + Date.now(),
-                name: name.trim(),
-                contact: '',
-                learning: '',
-                roles: ['燈光']
-            };
-
-            volunteers.push(newVol);
-            activeUserId = newVol.id;
-            syncToSupabase();
-            populateUserSelector();
-            updateProfileUI();
-            showToast(`已成功新增義工：${name}`);
+            const newV = { id: 'v_' + Date.now(), name: name.trim(), contact: '', learning: '', roles: ['燈光'] };
+            volunteers.push(newV); activeUserId = newV.id;
+            syncToSupabase(); refreshUI(); showToast(`新增：${name}`);
         }
 
         function renderVolunteersLearningSummary() {
-            const container = document.getElementById('volunteers-learning-summary');
-            if (!container) return;
-            container.innerHTML = '';
-
-            volunteers.forEach(v => {
-                const card = document.createElement('div');
-                card.className = "p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1";
-                const rolesTags = v.roles.length > 0 
-                    ? v.roles.map(r => `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded-md font-semibold">${r}</span>`).join(' ') 
-                    : '<span class="text-slate-400 text-[10px]">培訓中</span>';
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-slate-800">${v.name} <span class="text-[10px] text-slate-400 font-normal">(${v.contact || '無聯絡'})</span></span>
-                        <div>${rolesTags}</div>
-                    </div>
-                    <div class="text-[11px] text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200/60 flex items-center gap-1.5">
-                        <i class="fa-solid fa-graduation-cap text-amber-600"></i>
-                        <span>${v.learning || '暫無特別學習註記'}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+            const container = document.getElementById('volunteers-learning-summary'); if (!container) return;
+            container.innerHTML = volunteers.map(v => `
+                <div class="p-2 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="flex justify-between font-bold"><span>${v.name}</span><span class="text-[10px] text-emerald-600">${v.roles.join(', ') || '無崗位'}</span></div>
+                    <div class="text-[11px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded mt-1">${v.learning || '無特別註記'}</div>
+                </div>`).join('');
         }
 
         function renderScheduleCards() {
-            const container = document.getElementById('schedule-cards-list');
-            if (!container) return;
+            const container = document.getElementById('schedule-cards-list'); if (!container) return;
             container.innerHTML = '';
-
-            weekendDates.forEach(week => {
-                const sessionsInWeek = [];
-                if (week.saturdayStr) sessionsInWeek.push({ date: week.saturdayStr, session: SESSIONS[0] });
-                if (week.sundayStr) {
-                    sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[1] });
-                    sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[2] });
-                }
-
-                sessionsInWeek.forEach(s => {
-                    const rKey = `${s.date}_${s.session.key}`;
-                    const rosterData = rosters[rKey] || {};
-
-                    let isMine = false;
-                    ROLES.forEach(r => {
-                        if (rosterData[r] === activeUserId) isMine = true;
-                    });
-
+            weekendDates.forEach(w => {
+                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                sess.forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    let isMine = ROLES.some(r => rosterData[r] === activeUserId);
                     if (scheduleFilter === 'mine' && !isMine) return;
 
+                    let grid = ROLES.map(r => {
+                        const v = volunteers.find(vol => vol.id === rosterData[r]);
+                        return `<div class="p-2 rounded-xl bg-slate-50 border flex justify-between text-xs"><span class="text-slate-500">${r}</span><span class="font-bold">${v ? v.name : '待補充'}</span></div>`;
+                    }).join('');
+
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-2xl border border-slate-200/90 p-3.5 shadow-sm space-y-3";
-
-                    let rolesGrid = '';
-                    ROLES.forEach(role => {
-                        const assignedId = rosterData[role];
-                        const assignedVol = volunteers.find(v => v.id === assignedId);
-                        const isUserMe = assignedId === activeUserId;
-
-                        rolesGrid += `
-                            <div class="p-2 rounded-xl ${isUserMe ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-50 border border-slate-100'} flex items-center justify-between">
-                                <span class="text-[11px] font-semibold text-slate-500">${role}</span>
-                                <span class="text-xs font-bold ${isUserMe ? 'text-emerald-600' : (assignedVol ? 'text-slate-800' : 'text-amber-600')}">
-                                    ${assignedVol ? assignedVol.name + (isUserMe ? ' (您)' : '') : '待補充'}
-                                </span>
-                            </div>
-                        `;
-                    });
-
-                    card.innerHTML = `
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span class="text-xs font-bold text-slate-800">
-                                <i class="fa-solid fa-clock text-emerald-600"></i> ${s.date} (${s.session.day === 'Sat' ? '週六' : '週日'}) ${s.session.name}
-                            </span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">${rolesGrid}</div>
-                    `;
+                    card.className = "bg-white rounded-2xl border p-3.5 space-y-2 shadow-sm";
+                    card.innerHTML = `<div class="font-bold text-xs border-b pb-1 text-slate-800"><i class="fa-solid fa-clock text-emerald-600"></i> ${item.d} ${item.s.name}</div><div class="grid grid-cols-2 gap-2">${grid}</div>`;
                     container.appendChild(card);
                 });
             });
         }
 
-        function filterScheduleView(filter) {
-            scheduleFilter = filter;
-            document.getElementById('filter-all-btn').className = filter === 'all' ? "px-2.5 py-1 rounded-md bg-white text-slate-800 shadow-sm transition font-bold" : "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition";
-            document.getElementById('filter-mine-btn').className = filter === 'mine' ? "px-2.5 py-1 rounded-md bg-white text-slate-800 shadow-sm transition font-bold" : "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition";
+        function filterScheduleView(f) {
+            scheduleFilter = f;
+            document.getElementById('filter-all-btn').className = f === 'all' ? "px-2.5 py-1 rounded-md bg-white font-bold" : "px-2.5 py-1 text-slate-600";
+            document.getElementById('filter-mine-btn').className = f === 'mine' ? "px-2.5 py-1 rounded-md bg-white font-bold" : "px-2.5 py-1 text-slate-600";
             renderScheduleCards();
         }
 
-        function switchTab(tabName) {
-            const tabs = ['rules', 'schedule', 'profile', 'manager', 'admin'];
-            tabs.forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                const nav = document.getElementById(`nav-${t}`);
-                if (el) el.classList.add('hidden');
-                if (nav) nav.className = "flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 font-medium transition";
+        function switchTab(tab) {
+            ['rules', 'schedule', 'profile', 'manager', 'admin'].forEach(t => {
+                document.getElementById(`tab-${t}`)?.classList.add('hidden');
+                document.getElementById(`nav-${t}`)?.classList.replace('text-emerald-600', 'text-slate-400');
             });
-
-            const activeEl = document.getElementById(`tab-${tabName}`);
-            const activeNav = document.getElementById(`nav-${tabName}`);
-            if (activeEl) activeEl.classList.remove('hidden');
-            if (activeNav) activeNav.className = "flex flex-col items-center py-1 px-1.5 text-emerald-600 font-bold transition";
-
-            if (tabName === 'manager') renderManagerBoard();
+            document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
+            document.getElementById(`nav-${tab}`)?.classList.replace('text-slate-400', 'text-emerald-600');
+            if (tab === 'manager') renderManagerBoard();
         }
 
         function toggleManagerModePrompt() {
             if (isManagerMode) {
                 isManagerMode = false;
                 document.getElementById('role-mode-text').textContent = "一般義工模式";
-                document.getElementById('role-mode-icon').className = "fa-solid fa-user text-slate-500";
                 document.getElementById('manager-control-box').classList.add('hidden');
                 document.getElementById('nav-manager').classList.add('hidden');
                 switchTab('rules');
-                showToast("已切換回一般義工模式");
-            } else {
-                document.getElementById('password-modal').classList.remove('hidden');
-                document.getElementById('manager-password-input').focus();
-            }
+            } else { document.getElementById('password-modal').classList.remove('hidden'); }
         }
 
         function verifyManagerPassword() {
-            const pwd = document.getElementById('manager-password-input').value;
-            if (pwd === managerPassword) {
+            if (document.getElementById('manager-password-input').value === managerPassword) {
                 isManagerMode = true;
-                document.getElementById('password-error').classList.add('hidden');
                 document.getElementById('password-modal').classList.add('hidden');
-                document.getElementById('manager-password-input').value = '';
-                
                 document.getElementById('role-mode-text').textContent = "管理者模式";
-                document.getElementById('role-mode-icon').className = "fa-solid fa-user-shield text-amber-500";
                 document.getElementById('manager-control-box').classList.remove('hidden');
                 document.getElementById('nav-manager').classList.remove('hidden');
-                
-                switchTab('manager');
-                showToast("已驗證進入管理者模式！");
-            } else {
-                document.getElementById('password-error').classList.remove('hidden');
-            }
+                switchTab('manager'); showToast("已進入管理模式");
+            } else { document.getElementById('password-error').classList.remove('hidden'); }
         }
 
-        function closePasswordModal() {
-            document.getElementById('password-modal').classList.add('hidden');
-            document.getElementById('manager-password-input').value = '';
-        }
+        function closePasswordModal() { document.getElementById('password-modal').classList.add('hidden'); }
 
         function renderManagerBoard() {
-            const select = document.getElementById('manager-week-selector');
-            const container = document.getElementById('manager-board-container');
+            const select = document.getElementById('manager-week-selector'), container = document.getElementById('manager-board-container');
             if (!container) return;
-
-            if (select.children.length === 0) {
-                select.innerHTML = weekendDates.map(w => `<option value="${w.id}">${w.label} (${w.saturdayStr || ''})</option>`).join('');
-            }
-
-            const weekId = parseInt(select.value || "1");
-            const week = weekendDates.find(w => w.id === weekId) || weekendDates[0];
-
+            if (select.children.length === 0) select.innerHTML = weekendDates.map(w => `<option value="${w.id}">${w.label}</option>`).join('');
+            const week = weekendDates.find(w => w.id === parseInt(select.value || "1")) || weekendDates[0];
             container.innerHTML = '';
-            if (!week) return;
+            const sess = [{ d: week.saturdayStr, s: SESSIONS[0] }, { d: week.sundayStr, s: SESSIONS[1] }, { d: week.sundayStr, s: SESSIONS[2] }];
 
-            const sessionsInWeek = [];
-            if (week.saturdayStr) sessionsInWeek.push({ date: week.saturdayStr, session: SESSIONS[0] });
-            if (week.sundayStr) {
-                sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[1] });
-                sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[2] });
-            }
-
-            sessionsInWeek.forEach(s => {
-                const rKey = `${s.date}_${s.session.key}`;
-                const rosterData = rosters[rKey] || {};
-
-                const sessionBox = document.createElement('div');
-                sessionBox.className = "bg-white rounded-2xl border border-slate-200 p-3.5 space-y-3 shadow-sm";
-
-                let rolesHTML = '';
-                ROLES.forEach(role => {
-                    const assignedId = rosterData[role];
-                    const options = volunteers.map(v => `<option value="${v.id}" ${v.id === assignedId ? 'selected' : ''}>${v.name}</option>`).join('');
-
-                    rolesHTML += `
-                        <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
-                            <span class="text-xs font-bold text-slate-700 w-12">${role}</span>
-                            <select onchange="updateRosterAssignment('${rKey}', '${role}', this.value)" class="flex-1 bg-white border border-slate-300 rounded-lg p-1.5 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                                <option value="">-- 未指派 --</option>
-                                ${options}
-                            </select>
-                        </div>
-                    `;
-                });
-
-                sessionBox.innerHTML = `
-                    <div class="font-bold text-xs text-slate-800 flex items-center gap-1.5 border-b border-slate-100 pb-2">
-                        <i class="fa-solid fa-calendar-day text-emerald-600"></i> ${s.date} ${s.session.name}
-                    </div>
-                    <div class="space-y-2">${rolesHTML}</div>
-                `;
-                container.appendChild(sessionBox);
+            sess.forEach(item => {
+                const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                let html = ROLES.map(r => `
+                    <div class="flex items-center justify-between p-2 bg-slate-50 border rounded-xl text-xs">
+                        <span class="font-bold text-slate-700">${r}</span>
+                        <select onchange="updateRosterAssignment('${rKey}', '${r}', this.value)" class="bg-white border rounded p-1">
+                            <option value="">-- 未指派 --</option>
+                            ${volunteers.map(v => `<option value="${v.id}" ${rosterData[r] === v.id ? 'selected' : ''}>${v.name}</option>`).join('')}
+                        </select>
+                    </div>`).join('');
+                const box = document.createElement('div');
+                box.className = "bg-white rounded-2xl border p-3.5 space-y-2 shadow-sm";
+                box.innerHTML = `<div class="font-bold text-xs border-b pb-1 text-slate-800">${item.d} ${item.s.name}</div><div class="space-y-1.5">${html}</div>`;
+                container.appendChild(box);
             });
         }
 
         function updateRosterAssignment(rKey, role, volId) {
             if (!rosters[rKey]) rosters[rKey] = {};
-            if (volId) {
-                rosters[rKey][role] = volId;
-            } else {
-                delete rosters[rKey][role];
-            }
-            syncToSupabase();
-            renderScheduleCards();
-            renderMasterRoster();
-            showToast("手動排班已更新！");
+            if (volId) rosters[rKey][role] = volId; else delete rosters[rKey][role];
+            syncToSupabase(); renderScheduleCards(); renderMasterRoster(); showToast("排班已更動");
         }
 
         function clearAllRosters() {
-            if (confirm("確定要清空所有排班資料嗎？")) {
-                rosters = {};
-                syncToSupabase();
-                refreshUI();
-                showToast("已清空排班！");
-            }
+            if (confirm("確定要清空所有班表嗎？")) { rosters = {}; syncToSupabase(); refreshUI(); showToast("已清空"); }
         }
 
         function renderMasterRoster() {
-            const tbody = document.getElementById('master-roster-tbody');
-            if (!tbody) return;
+            const tbody = document.getElementById('master-roster-tbody'); if (!tbody) return;
             tbody.innerHTML = '';
-
-            weekendDates.forEach(week => {
-                const sessionsInWeek = [];
-                if (week.saturdayStr) sessionsInWeek.push({ date: week.saturdayStr, session: SESSIONS[0] });
-                if (week.sundayStr) {
-                    sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[1] });
-                    sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[2] });
-                }
-
-                sessionsInWeek.forEach(s => {
-                    const rKey = `${s.date}_${s.session.key}`;
-                    const rosterData = rosters[rKey] || {};
-
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 border-b border-slate-100";
-
-                    let cells = `<td class="p-2.5 font-bold text-slate-800 whitespace-nowrap">${s.date} ${s.session.day}</td>`;
-                    ROLES.forEach(role => {
-                        const vol = volunteers.find(v => v.id === rosterData[role]);
-                        cells += `<td class="p-2.5 text-xs font-medium ${vol ? 'text-slate-800' : 'text-slate-300'}">${vol ? vol.name : '-'}</td>`;
-                    });
-
-                    tr.innerHTML = cells;
-                    tbody.appendChild(tr);
+            weekendDates.forEach(w => {
+                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                sess.forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    let tr = document.createElement('tr');
+                    let tds = `<td class="p-2 font-bold">${item.d} ${item.s.day}</td>` + ROLES.map(r => {
+                        const v = volunteers.find(vol => vol.id === rosterData[r]);
+                        return `<td class="p-2">${v ? v.name : '-'}</td>`;
+                    }).join('');
+                    tr.innerHTML = tds; tbody.appendChild(tr);
                 });
             });
         }
 
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "日期場次,燈光,VJ,PPR,舞監\n";
-
-            weekendDates.forEach(week => {
-                const sessionsInWeek = [];
-                if (week.saturdayStr) sessionsInWeek.push({ date: week.saturdayStr, session: SESSIONS[0] });
-                if (week.sundayStr) {
-                    sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[1] });
-                    sessionsInWeek.push({ date: week.sundayStr, session: SESSIONS[2] });
-                }
-
-                sessionsInWeek.forEach(s => {
-                    const rKey = `${s.date}_${s.session.key}`;
-                    const rosterData = rosters[rKey] || {};
-                    const row = [
-                        `"${s.date} ${s.session.name}"`,
-                        `"${volunteers.find(v => v.id === rosterData['燈光'])?.name || '-'}"`,
-                        `"${volunteers.find(v => v.id === rosterData['VJ'])?.name || '-'}"`,
-                        `"${volunteers.find(v => v.id === rosterData['PPR'])?.name || '-'}"`,
-                        `"${volunteers.find(v => v.id === rosterData['舞監'])?.name || '-'}"`
-                    ];
-                    csvContent += row.join(",") + "\n";
+            let csv = "data:text/csv;charset=utf-8,\uFEFF日期場次,燈光,VJ,PPR,舞監\n";
+            weekendDates.forEach(w => {
+                [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }].forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    csv += `"${item.d} ${item.s.name}",` + ROLES.map(r => `"${volunteers.find(v => v.id === rosterData[r])?.name || '-'}"`).join(',') + "\n";
                 });
             });
+            const link = document.createElement("a"); link.href = encodeURI(csv); link.download = "服事輪值表.csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast("已下載 CSV");
+        }
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "教會服事輪值表.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("已成功下載 CSV 檔案
+        function copyToClipboardTable() {
+            let txt = "日期場次\t燈光\tVJ\tPPR\t舞監\n";
+            weekendDates.forEach(w => {
+                [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }].forEach(item => {
+                    const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
+                    txt += `${item.d} ${item.s.name}\t` + ROLES.map(r => volunteers.find(v => v.id === rosterData[r])?.name || '-').join('\t') + "\n";
+                });
+            });
+            navigator.clipboard.writeText(txt).then(() => showToast("已複製表格！"));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 2000);
+        }
+
+        window.onload = function() {
+            weekendDates = generateWeekendDates();
+            loadDataFromSupabase();
+        };
+    </script>
+</body>
+</html>
