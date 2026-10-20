@@ -60,6 +60,13 @@
                 </div>
                 <div class="space-y-2.5 text-xs">
                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-1">
+                        <div class="font-bold text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-fire text-amber-500"></i> 週四禱告會</div>
+                        <ul class="space-y-1 text-slate-700 pl-4 list-disc">
+                            <li><b>18:00</b> 聚管組預備跟綵排</li>
+                            <li><b>19:30–21:00</b> 週四禱告會聚會</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-1">
                         <div class="font-bold text-emerald-700 flex items-center gap-1.5"><i class="fa-solid fa-moon text-amber-500"></i> 週六晚堂</div>
                         <ul class="space-y-1 text-slate-700 pl-4 list-disc">
                             <li><b>17:20</b> 聚管組預備跟綵排</li>
@@ -165,7 +172,7 @@
                 <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">管理模式</span>
             </div>
             <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between text-xs font-bold">
-                <label>選擇排班週末：</label>
+                <label>選擇排班週次：</label>
                 <select id="manager-week-selector" onchange="renderManagerBoard()" class="bg-slate-50 border border-slate-300 rounded-lg p-1.5"></select>
             </div>
             <div id="manager-board-container" class="space-y-4"></div>
@@ -241,6 +248,7 @@
 
         const ROLES = ['燈光', 'VJ', 'PPR', '舞監'];
         const SESSIONS = [
+            { key: 'Thu_1930', name: '週四 19:30', day: 'Thu' },
             { key: 'Sat_1900', name: '週六 19:00', day: 'Sat' },
             { key: 'Sun_0930', name: '週日 09:30', day: 'Sun' },
             { key: 'Sun_1400', name: '週日 14:00', day: 'Sun' }
@@ -297,12 +305,30 @@
             while (curr.getDay() !== 6 && curr <= endDate) curr.setDate(curr.getDate() + 1);
             let idx = 1;
             while (curr <= endDate) {
-                const sat = new Date(curr), sun = new Date(curr); sun.setDate(sun.getDate() + 1);
+                const sat = new Date(curr);
+                const sun = new Date(curr); sun.setDate(sun.getDate() + 1);
+                const thu = new Date(curr); thu.setDate(thu.getDate() - 2);
+
                 const fmt = d => `${d.getMonth() + 1}/${d.getDate()}`;
-                list.push({ id: idx++, label: `${sat.getMonth() + 1}月第 ${Math.ceil(sat.getDate() / 7)} 週`, saturdayStr: fmt(sat), sundayStr: fmt(sun) });
+                list.push({
+                    id: idx++,
+                    label: `${sat.getMonth() + 1}月第 ${Math.ceil(sat.getDate() / 7)} 週`,
+                    thursdayStr: fmt(thu),
+                    saturdayStr: fmt(sat),
+                    sundayStr: fmt(sun)
+                });
                 curr.setDate(curr.getDate() + 7);
             }
             return list;
+        }
+
+        function getWeekSessions(w) {
+            return [
+                { d: w.thursdayStr, s: SESSIONS[0] },
+                { d: w.saturdayStr, s: SESSIONS[1] },
+                { d: w.sundayStr, s: SESSIONS[2] },
+                { d: w.sundayStr, s: SESSIONS[3] }
+            ];
         }
 
         function refreshUI() {
@@ -447,7 +473,7 @@
             volunteers.forEach(v => roleCounts[v.id] = 0);
 
             weekendDates.forEach(w => {
-                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                const sess = getWeekSessions(w);
                 sess.forEach(item => {
                     const rKey = `${item.d}_${item.s.key}`;
                     rosters[rKey] = {};
@@ -492,7 +518,7 @@
             const container = document.getElementById('schedule-cards-list'); if (!container) return;
             container.innerHTML = '';
             weekendDates.forEach(w => {
-                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                const sess = getWeekSessions(w);
                 sess.forEach(item => {
                     const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
                     let isMine = ROLES.some(r => rosterData[r] === activeUserId);
@@ -559,7 +585,7 @@
             if (select.children.length === 0) select.innerHTML = weekendDates.map(w => `<option value="${w.id}">${w.label}</option>`).join('');
             const week = weekendDates.find(w => w.id === parseInt(select.value || "1")) || weekendDates[0];
             container.innerHTML = '';
-            const sess = [{ d: week.saturdayStr, s: SESSIONS[0] }, { d: week.sundayStr, s: SESSIONS[1] }, { d: week.sundayStr, s: SESSIONS[2] }];
+            const sess = getWeekSessions(week);
 
             sess.forEach(item => {
                 const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
@@ -592,7 +618,7 @@
             const tbody = document.getElementById('master-roster-tbody'); if (!tbody) return;
             tbody.innerHTML = '';
             weekendDates.forEach(w => {
-                const sess = [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }];
+                const sess = getWeekSessions(w);
                 sess.forEach(item => {
                     const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
                     let tr = document.createElement('tr');
@@ -608,7 +634,7 @@
         function exportCSV() {
             let csv = "data:text/csv;charset=utf-8,\uFEFF日期場次,燈光,VJ,PPR,舞監\n";
             weekendDates.forEach(w => {
-                [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }].forEach(item => {
+                getWeekSessions(w).forEach(item => {
                     const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
                     csv += `"${item.d} ${item.s.name}",` + ROLES.map(r => `"${volunteers.find(v => v.id === rosterData[r])?.name || '-'}"`).join(',') + "\n";
                 });
@@ -620,7 +646,7 @@
         function copyToClipboardTable() {
             let txt = "日期場次\t燈光\tVJ\tPPR\t舞監\n";
             weekendDates.forEach(w => {
-                [{ d: w.saturdayStr, s: SESSIONS[0] }, { d: w.sundayStr, s: SESSIONS[1] }, { d: w.sundayStr, s: SESSIONS[2] }].forEach(item => {
+                getWeekSessions(w).forEach(item => {
                     const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
                     txt += `${item.d} ${item.s.name}\t` + ROLES.map(r => volunteers.find(v => v.id === rosterData[r])?.name || '-').join('\t') + "\n";
                 });
