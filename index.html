@@ -120,7 +120,70 @@
             <div id="schedule-cards-list" class="space-y-3.5"></div>
         </section>
 
-        <!-- TAB 3: PROFILE -->
+        <!-- TAB 3: UNAVAILABLE DATES (不可服事登記) -->
+        <section id="tab-unavail" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                <div class="border-b border-slate-100 pb-2">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-xmark text-rose-500 text-base"></i>
+                        <span>不可服事 / 請假週次登記</span>
+                    </h2>
+                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700"></span>）無法排班的週次：</p>
+                </div>
+                <div id="unavail-weeks-list" class="space-y-2 text-xs"></div>
+                <button onclick="saveUnavailDates()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+                    <i class="fa-solid fa-floppy-disk"></i> 儲存不可服事設定
+                </button>
+            </div>
+
+            <!-- 全員不可服事統計概況 (所有義工可看) -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                <h3 class="text-xs font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clipboard-list text-amber-500"></i> 全員不克服事週次總覽
+                </h3>
+                <div id="unavail-summary-list" class="space-y-2 text-xs"></div>
+            </div>
+        </section>
+
+        <!-- TAB 4: MANAGER WORKSTATION -->
+        <section id="tab-manager" class="space-y-4 hidden">
+            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md flex items-center justify-between">
+                <span class="font-bold text-sm"><i class="fa-solid fa-sliders text-amber-400"></i> 管理者手動排班工作台</span>
+                <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">管理模式</span>
+            </div>
+            <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between text-xs font-bold">
+                <label>選擇排班週次：</label>
+                <select id="manager-week-selector" onchange="renderManagerBoard()" class="bg-slate-50 border border-slate-300 rounded-lg p-1.5"></select>
+            </div>
+            <div id="manager-board-container" class="space-y-4"></div>
+        </section>
+
+        <!-- TAB 5: MASTER ROSTER -->
+        <section id="tab-admin" class="space-y-4 hidden">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 space-y-2">
+                <div class="font-bold text-sm"><i class="fa-solid fa-file-excel"></i> 排班總表匯出</div>
+                <div class="flex gap-2">
+                    <button onclick="exportCSV()" class="flex-1 bg-emerald-600 text-white py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-download"></i> 下載 CSV</button>
+                    <button onclick="copyToClipboardTable()" class="flex-1 bg-white text-emerald-800 border border-emerald-300 py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-copy"></i> 複製表格</button>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto shadow-sm">
+                <table class="w-full text-left text-xs text-slate-700">
+                    <thead class="bg-slate-100 font-medium border-b border-slate-200">
+                        <tr>
+                            <th class="p-2.5">日期場次</th>
+                            <th class="p-2.5">💡 燈光</th>
+                            <th class="p-2.5">🖥️ VJ</th>
+                            <th class="p-2.5">🎛️ PPR</th>
+                            <th class="p-2.5">🎬 舞監</th>
+                        </tr>
+                    </thead>
+                    <tbody id="master-roster-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 6: PROFILE (排在最後) -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -164,54 +227,17 @@
                 <div id="volunteers-learning-summary" class="space-y-2 text-xs"></div>
             </div>
         </section>
-
-        <!-- TAB 4: MANAGER WORKSTATION -->
-        <section id="tab-manager" class="space-y-4 hidden">
-            <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md flex items-center justify-between">
-                <span class="font-bold text-sm"><i class="fa-solid fa-sliders text-amber-400"></i> 管理者手動排班工作台</span>
-                <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">管理模式</span>
-            </div>
-            <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex items-center justify-between text-xs font-bold">
-                <label>選擇排班週次：</label>
-                <select id="manager-week-selector" onchange="renderManagerBoard()" class="bg-slate-50 border border-slate-300 rounded-lg p-1.5"></select>
-            </div>
-            <div id="manager-board-container" class="space-y-4"></div>
-        </section>
-
-        <!-- TAB 5: MASTER ROSTER -->
-        <section id="tab-admin" class="space-y-4 hidden">
-            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 space-y-2">
-                <div class="font-bold text-sm"><i class="fa-solid fa-file-excel"></i> 排班總表匯出</div>
-                <div class="flex gap-2">
-                    <button onclick="exportCSV()" class="flex-1 bg-emerald-600 text-white py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-download"></i> 下載 CSV</button>
-                    <button onclick="copyToClipboardTable()" class="flex-1 bg-white text-emerald-800 border border-emerald-300 py-2 rounded-xl text-xs font-medium"><i class="fa-solid fa-copy"></i> 複製表格</button>
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto shadow-sm">
-                <table class="w-full text-left text-xs text-slate-700">
-                    <thead class="bg-slate-100 font-medium border-b border-slate-200">
-                        <tr>
-                            <th class="p-2.5">日期場次</th>
-                            <th class="p-2.5">💡 燈光</th>
-                            <th class="p-2.5">🖥️ VJ</th>
-                            <th class="p-2.5">🎛️ PPR</th>
-                            <th class="p-2.5">🎬 舞監</th>
-                        </tr>
-                    </thead>
-                    <tbody id="master-roster-tbody" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </section>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (義工設定移至最後) -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
         <div class="max-w-md mx-auto flex justify-around py-1.5">
-            <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1.5 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
-            <button id="nav-schedule" onclick="switchTab('schedule')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-base mb-0.5"></i><span class="text-[10px]">輪值表</span></button>
-            <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium hidden"><i class="fa-solid fa-sliders text-base mb-0.5"></i><span class="text-[10px]">手動排班</span></button>
-            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-user text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
-            <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1.5 text-slate-400 font-medium"><i class="fa-solid fa-file-export text-base mb-0.5"></i><span class="text-[10px]">總表</span></button>
+            <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
+            <button id="nav-schedule" onclick="switchTab('schedule')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-base mb-0.5"></i><span class="text-[10px]">輪值表</span></button>
+            <button id="nav-unavail" onclick="switchTab('unavail')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-calendar-xmark text-base mb-0.5"></i><span class="text-[10px]">請假登記</span></button>
+            <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium hidden"><i class="fa-solid fa-sliders text-base mb-0.5"></i><span class="text-[10px]">手動排班</span></button>
+            <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-file-export text-base mb-0.5"></i><span class="text-[10px]">總表</span></button>
+            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-user text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
         </div>
     </nav>
 
@@ -256,12 +282,12 @@
 
         let isManagerMode = false, managerPassword = "1234", activeUserId = "v1";
         let volunteers = [
-            { id: 'v1', name: '子祈', contact: '', roles: ['燈光', 'VJ'], learning: '' },
-            { id: 'v2', name: 'Joshua', contact: '', roles: ['PPR', '舞監'], learning: '' },
-            { id: 'v3', name: '宥安', contact: '', roles: ['燈光'], learning: '' },
-            { id: 'v4', name: '凱欣', contact: '', roles: ['VJ'], learning: '' },
-            { id: 'v5', name: '捷飛', contact: '', roles: ['PPR'], learning: '' },
-            { id: 'v6', name: '紀宏', contact: '', roles: ['舞監'], learning: '' }
+            { id: 'v1', name: '子祈', contact: '', roles: ['燈光', 'VJ'], learning: '', unavail: [] },
+            { id: 'v2', name: 'Joshua', contact: '', roles: ['PPR', '舞監'], learning: '', unavail: [] },
+            { id: 'v3', name: '宥安', contact: '', roles: ['燈光'], learning: '', unavail: [] },
+            { id: 'v4', name: '凱欣', contact: '', roles: ['VJ'], learning: '', unavail: [] },
+            { id: 'v5', name: '捷飛', contact: '', roles: ['PPR'], learning: '', unavail: [] },
+            { id: 'v6', name: '紀宏', contact: '', roles: ['舞監'], learning: '', unavail: [] }
         ];
         let rosters = {}, weekendDates = [], scheduleFilter = 'all';
 
@@ -337,6 +363,7 @@
             updateProfileUI();
             renderVolunteersLearningSummary();
             renderScheduleCards();
+            renderUnavailDatesTab();
             if (isManagerMode) renderManagerBoard();
             renderMasterRoster();
         }
@@ -344,7 +371,6 @@
         function renderTopUserSelector() {
             const container = document.getElementById('top-user-selector-container');
             if (!container) return;
-            const curr = volunteers.find(v => v.id === activeUserId);
             container.innerHTML = `
                 <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm mb-4 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -431,7 +457,7 @@
             }
             const name = prompt("輸入義工姓名：");
             if (!name) return;
-            const newV = { id: 'v_' + Date.now(), name: name.trim(), contact: '', learning: '', roles: ['燈光'] };
+            const newV = { id: 'v_' + Date.now(), name: name.trim(), contact: '', learning: '', roles: ['燈光'], unavail: [] };
             volunteers.push(newV); activeUserId = newV.id;
             syncToSupabase(); refreshUI(); showToast(`新增：${name}`);
         }
@@ -467,7 +493,7 @@
         }
 
         function autoGenerateRoster() {
-            if (!confirm("確定要自動生成智慧排班嗎？這將覆蓋現有的排班！")) return;
+            if (!confirm("確定要自動生成智慧排班嗎？這將考慮義工不可服事時間並覆蓋現有排班！")) return;
 
             let roleCounts = {};
             volunteers.forEach(v => roleCounts[v.id] = 0);
@@ -479,7 +505,13 @@
                     rosters[rKey] = {};
 
                     ROLES.forEach(r => {
-                        const candidates = volunteers.filter(v => v.roles.includes(r));
+                        // 篩選具備崗位且當週未登記「不可服事」的義工
+                        const candidates = volunteers.filter(v => {
+                            const isCapable = v.roles.includes(r);
+                            const isUnavailable = (v.unavail || []).includes(w.id);
+                            return isCapable && !isUnavailable;
+                        });
+
                         if (candidates.length > 0) {
                             candidates.sort((a, b) => (roleCounts[a.id] || 0) - (roleCounts[b.id] || 0));
                             const chosen = candidates[0];
@@ -514,6 +546,7 @@
                 </div>`).join('');
         }
 
+        // 核心功能：渲染服事卡片（加入高亮顯色）
         function renderScheduleCards() {
             const container = document.getElementById('schedule-cards-list'); if (!container) return;
             container.innerHTML = '';
@@ -526,7 +559,20 @@
 
                     let grid = ROLES.map(r => {
                         const v = volunteers.find(vol => vol.id === rosterData[r]);
-                        return `<div class="p-2 rounded-xl bg-slate-50 border flex justify-between text-xs"><span class="text-slate-500">${r}</span><span class="font-bold">${v ? v.name : '待補充'}</span></div>`;
+                        const isSelf = v && v.id === activeUserId;
+                        
+                        // 高亮顯色樣式：若為當前選擇的義工，使用金黃色顯眼標記！
+                        const bgClass = isSelf 
+                            ? "bg-amber-100 border-amber-400 text-amber-950 font-bold shadow-sm ring-2 ring-amber-300" 
+                            : "bg-slate-50 border-slate-200 text-slate-800";
+                        const roleClass = isSelf ? "text-amber-800 font-bold" : "text-slate-500";
+
+                        return `
+                            <div class="p-2 rounded-xl border flex justify-between text-xs transition ${bgClass}">
+                                <span class="${roleClass}">${r}</span>
+                                <span>${v ? v.name : '待補充'}${isSelf ? ' ★' : ''}</span>
+                            </div>
+                        `;
                     }).join('');
 
                     const card = document.createElement('div');
@@ -537,6 +583,61 @@
             });
         }
 
+        // 渲染「不可服事登記」頁面
+        function renderUnavailDatesTab() {
+            const currV = volunteers.find(v => v.id === activeUserId);
+            const nameSpan = document.getElementById('unavail-user-name');
+            if (nameSpan && currV) nameSpan.textContent = currV.name;
+
+            const listContainer = document.getElementById('unavail-weeks-list');
+            if (listContainer && currV) {
+                const userUnavail = currV.unavail || [];
+                listContainer.innerHTML = weekendDates.map(w => {
+                    const isChecked = userUnavail.includes(w.id);
+                    return `
+                        <label class="flex items-center justify-between p-2.5 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer">
+                            <span class="font-semibold text-slate-700">${w.label} (${w.saturdayStr} ~ ${w.sundayStr})</span>
+                            <input type="checkbox" value="${w.id}" class="unavail-checkbox h-4 w-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500" ${isChecked ? 'checked' : ''}>
+                        </label>
+                    `;
+                }).join('');
+            }
+
+            // 渲染全體不可服事統計概況
+            const summaryContainer = document.getElementById('unavail-summary-list');
+            if (summaryContainer) {
+                summaryContainer.innerHTML = weekendDates.map(w => {
+                    const unavailVols = volunteers.filter(v => (v.unavail || []).includes(w.id));
+                    return `
+                        <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-start justify-between gap-2">
+                            <span class="font-bold text-slate-800 shrink-0">${w.label}</span>
+                            <div class="text-right">
+                                ${unavailVols.length > 0 
+                                    ? `<span class="text-rose-600 font-medium">${unavailVols.map(v => v.name).join(', ')} 請假</span>` 
+                                    : `<span class="text-emerald-600 font-medium"><i class="fa-solid fa-check"></i> 全員可服事</span>`}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function saveUnavailDates() {
+            const currV = volunteers.find(v => v.id === activeUserId);
+            if (!currV) return;
+
+            const checkboxes = document.querySelectorAll('.unavail-checkbox');
+            const selectedWeeks = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) selectedWeeks.push(parseInt(cb.value));
+            });
+
+            currV.unavail = selectedWeeks;
+            syncToSupabase();
+            refreshUI();
+            showToast(`已更新 ${currV.name} 的請假週次！`);
+        }
+
         function filterScheduleView(f) {
             scheduleFilter = f;
             document.getElementById('filter-all-btn').className = f === 'all' ? "px-2.5 py-1 rounded-md bg-white font-bold" : "px-2.5 py-1 text-slate-600";
@@ -545,7 +646,7 @@
         }
 
         function switchTab(tab) {
-            ['rules', 'schedule', 'profile', 'manager', 'admin'].forEach(t => {
+            ['rules', 'schedule', 'unavail', 'profile', 'manager', 'admin'].forEach(t => {
                 document.getElementById(`tab-${t}`)?.classList.add('hidden');
                 document.getElementById(`nav-${t}`)?.classList.replace('text-emerald-600', 'text-slate-400');
             });
@@ -594,7 +695,10 @@
                         <span class="font-bold text-slate-700">${r}</span>
                         <select onchange="updateRosterAssignment('${rKey}', '${r}', this.value)" class="bg-white border rounded p-1">
                             <option value="">-- 未指派 --</option>
-                            ${volunteers.map(v => `<option value="${v.id}" ${rosterData[r] === v.id ? 'selected' : ''}>${v.name}</option>`).join('')}
+                            ${volunteers.map(v => {
+                                const isUnavail = (v.unavail || []).includes(week.id);
+                                return `<option value="${v.id}" ${rosterData[r] === v.id ? 'selected' : ''}>${v.name}${isUnavail ? ' (請假)' : ''}</option>`;
+                            }).join('')}
                         </select>
                     </div>`).join('');
                 const box = document.createElement('div');
@@ -624,7 +728,8 @@
                     let tr = document.createElement('tr');
                     let tds = `<td class="p-2 font-bold">${item.d} ${item.s.day}</td>` + ROLES.map(r => {
                         const v = volunteers.find(vol => vol.id === rosterData[r]);
-                        return `<td class="p-2">${v ? v.name : '-'}</td>`;
+                        const isSelf = v && v.id === activeUserId;
+                        return `<td class="p-2 ${isSelf ? 'bg-amber-100 font-bold text-amber-900' : ''}">${v ? v.name : '-'}</td>`;
                     }).join('');
                     tr.innerHTML = tds; tbody.appendChild(tr);
                 });
