@@ -158,7 +158,7 @@
             </div>
         </section>
 
-        <!-- TAB 5: UNAVAILABLE SESSIONS (按「場次」請假登記，位在總表後、義工設定前) -->
+        <!-- TAB 5: UNAVAILABLE SESSIONS (按場次請假登記) -->
         <section id="tab-unavail" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
                 <div class="border-b border-slate-100 pb-2">
@@ -166,7 +166,7 @@
                         <i class="fa-solid fa-calendar-xmark text-rose-500 text-base"></i>
                         <span>不可服事 / 請假場次登記</span>
                     </h2>
-                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700">--</span>）無法排班的**具體場次**：</p>
+                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700">--</span>）無法排班的場次：</p>
                 </div>
                 <div id="unavail-weeks-list" class="space-y-2 text-xs max-h-96 overflow-y-auto pr-1"></div>
                 <button onclick="saveUnavailDates()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
@@ -183,7 +183,7 @@
             </div>
         </section>
 
-        <!-- TAB 6: PROFILE (義工設定，位於導覽最後) -->
+        <!-- TAB 6: PROFILE (義工設定，位於最後) -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -229,7 +229,7 @@
         </section>
     </main>
 
-    <!-- Bottom Navigation (請假登記移至總表後、義工設定前) -->
+    <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
         <div class="max-w-md mx-auto flex justify-around py-1.5">
             <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
@@ -290,6 +290,16 @@
             { id: 'v6', name: '紀宏', contact: '', roles: ['舞監'], learning: '', unavail: [] }
         ];
         let rosters = {}, weekendDates = [], scheduleFilter = 'all';
+
+        // 安全取得當前選取的義工物件
+        function getActiveUser() {
+            let u = volunteers.find(v => v.id === activeUserId || v.id == activeUserId);
+            if (!u && volunteers.length > 0) {
+                u = volunteers[0];
+                activeUserId = u.id;
+            }
+            return u;
+        }
 
         async function loadDataFromSupabase() {
             if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); loadFromLocal(); return; }
@@ -386,6 +396,7 @@
         function renderTopUserSelector() {
             const container = document.getElementById('top-user-selector-container');
             if (!container) return;
+            const curr = getActiveUser();
             container.innerHTML = `
                 <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm mb-4 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -393,7 +404,7 @@
                         <div class="text-xs flex-1 min-w-0">
                             <span class="text-slate-400 block text-[10px]">當前選取義工：</span>
                             <select onchange="switchCurrentUser(this.value)" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs w-full">
-                                ${volunteers.map(v => `<option value="${v.id}" ${v.id === activeUserId ? 'selected' : ''}>${v.name}</option>`).join('')}
+                                ${volunteers.map(v => `<option value="${v.id}" ${curr && (v.id === curr.id) ? 'selected' : ''}>${v.name}</option>`).join('')}
                             </select>
                         </div>
                     </div>
@@ -404,8 +415,8 @@
         function populateUserSelector() {
             const select = document.getElementById('profile-user-select');
             if (!select) return;
-            select.innerHTML = volunteers.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
-            if (activeUserId) select.value = activeUserId;
+            const curr = getActiveUser();
+            select.innerHTML = volunteers.map(v => `<option value="${v.id}" ${curr && (v.id === curr.id) ? 'selected' : ''}>${v.name}</option>`).join('');
         }
 
         function switchCurrentUser(id) {
@@ -414,7 +425,7 @@
         }
 
         function updateProfileUI() {
-            const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
+            const u = getActiveUser(); if (!u) return;
             document.getElementById('profile-name').value = u.name || '';
             document.getElementById('profile-contact').value = u.contact || '';
             document.getElementById('profile-learning').value = u.learning || '';
@@ -452,7 +463,7 @@
                 alert("只有管理者模式可以修改義工資料！");
                 return;
             }
-            const u = volunteers.find(v => v.id === activeUserId); if (!u) return;
+            const u = getActiveUser(); if (!u) return;
             u.name = document.getElementById('profile-name').value.trim() || u.name;
             u.contact = document.getElementById('profile-contact').value.trim();
             u.learning = document.getElementById('profile-learning').value.trim();
@@ -563,16 +574,18 @@
         function renderScheduleCards() {
             const container = document.getElementById('schedule-cards-list'); if (!container) return;
             container.innerHTML = '';
+            const curr = getActiveUser();
+
             weekendDates.forEach(w => {
                 const sess = getWeekSessions(w);
                 sess.forEach(item => {
                     const rKey = `${item.d}_${item.s.key}`, rosterData = rosters[rKey] || {};
-                    let isMine = ROLES.some(r => rosterData[r] === activeUserId);
+                    let isMine = curr && ROLES.some(r => rosterData[r] === curr.id);
                     if (scheduleFilter === 'mine' && !isMine) return;
 
                     let grid = ROLES.map(r => {
                         const v = volunteers.find(vol => vol.id === rosterData[r]);
-                        const isSelf = v && v.id === activeUserId;
+                        const isSelf = v && curr && (v.id === curr.id);
                         
                         const bgClass = isSelf 
                             ? "bg-amber-100 border-amber-400 text-amber-950 font-bold shadow-sm ring-2 ring-amber-300" 
@@ -595,26 +608,26 @@
             });
         }
 
-        // 核心修正：按「場次」渲染請假登記頁面（含核取方塊）
+        // 核心強化：確保 100% 渲染出核取方塊
         function renderUnavailDatesTab() {
-            const currV = volunteers.find(v => v.id === activeUserId);
+            const currV = getActiveUser();
             const nameSpan = document.getElementById('unavail-user-name');
-            if (nameSpan && currV) nameSpan.textContent = currV.name;
+            if (nameSpan) nameSpan.textContent = currV ? currV.name : '未選擇';
 
             const listContainer = document.getElementById('unavail-weeks-list');
             const allSessions = getAllSessionsList();
 
-            if (listContainer && currV) {
-                const userUnavail = currV.unavail || [];
+            if (listContainer) {
+                const userUnavail = (currV && currV.unavail) ? currV.unavail : [];
                 listContainer.innerHTML = allSessions.map(s => {
                     const isChecked = userUnavail.includes(s.rKey);
                     return `
-                        <label class="flex items-center justify-between p-2.5 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer">
+                        <label class="flex items-center justify-between p-2.5 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer hover:bg-slate-100">
                             <div>
                                 <span class="font-bold text-slate-800 text-xs">${s.label}</span>
                                 <span class="text-[10px] text-slate-400 block">${s.weekLabel}</span>
                             </div>
-                            <input type="checkbox" value="${s.rKey}" class="unavail-checkbox h-4 w-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500" ${isChecked ? 'checked' : ''}>
+                            <input type="checkbox" value="${s.rKey}" class="unavail-checkbox h-4 w-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500 cursor-pointer" ${isChecked ? 'checked' : ''}>
                         </label>
                     `;
                 }).join('');
@@ -640,7 +653,7 @@
         }
 
         function saveUnavailDates() {
-            const currV = volunteers.find(v => v.id === activeUserId);
+            const currV = getActiveUser();
             if (!currV) return;
 
             const checkboxes = document.querySelectorAll('.unavail-checkbox');
@@ -740,6 +753,8 @@
         function renderMasterRoster() {
             const tbody = document.getElementById('master-roster-tbody'); if (!tbody) return;
             tbody.innerHTML = '';
+            const curr = getActiveUser();
+
             weekendDates.forEach(w => {
                 const sess = getWeekSessions(w);
                 sess.forEach(item => {
@@ -747,7 +762,7 @@
                     let tr = document.createElement('tr');
                     let tds = `<td class="p-2 font-bold">${item.d} ${item.s.day}</td>` + ROLES.map(r => {
                         const v = volunteers.find(vol => vol.id === rosterData[r]);
-                        const isSelf = v && v.id === activeUserId;
+                        const isSelf = v && curr && (v.id === curr.id);
                         return `<td class="p-2 ${isSelf ? 'bg-amber-100 font-bold text-amber-900' : ''}">${v ? v.name : '-'}</td>`;
                     }).join('');
                     tr.innerHTML = tds; tbody.appendChild(tr);
