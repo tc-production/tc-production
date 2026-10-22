@@ -158,7 +158,7 @@
             </div>
         </section>
 
-        <!-- TAB 5: UNAVAILABLE SESSIONS (按場次請假登記) -->
+        <!-- TAB 5: UNAVAILABLE SESSIONS (請假登記) -->
         <section id="tab-unavail" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
                 <div class="border-b border-slate-100 pb-2">
@@ -166,7 +166,7 @@
                         <i class="fa-solid fa-calendar-xmark text-rose-500 text-base"></i>
                         <span>不可服事 / 請假場次登記</span>
                     </h2>
-                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700">--</span>）無法排班的場次：</p>
+                    <p class="text-[11px] text-slate-500 mt-1">當前登記對象：<span id="unavail-user-name" class="font-bold text-emerald-700">請先選取名字</span></p>
                 </div>
                 <div id="unavail-weeks-list" class="space-y-2 text-xs max-h-96 overflow-y-auto pr-1"></div>
                 <button onclick="saveUnavailDates()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
@@ -183,12 +183,12 @@
             </div>
         </section>
 
-        <!-- TAB 6: PROFILE (義工設定，位於最後) -->
+        <!-- TAB 6: PROFILE (收在管理員權限內，預設隱藏) -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                     <h2 class="text-base font-bold text-slate-800">義工設定與個人進度</h2>
-                    <span id="profile-manager-badge" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold hidden"><i class="fa-solid fa-lock text-[9px]"></i> 管理員編輯模式</span>
+                    <span id="profile-manager-badge" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold"><i class="fa-solid fa-lock text-[9px]"></i> 管理員模式</span>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">選擇編輯對象義工</label>
@@ -204,11 +204,11 @@
                         <input type="text" id="profile-contact" class="w-full border border-slate-300 rounded-xl p-2 text-sm">
                     </div>
                     <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
-                        <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-graduation-cap"></i> 目前學習/培訓項目 (僅管理員可編輯)</label>
+                        <label class="block text-xs font-bold text-amber-900 mb-1"><i class="fa-solid fa-graduation-cap"></i> 目前學習/培訓項目</label>
                         <input type="text" id="profile-learning" class="w-full bg-white border border-amber-300 rounded-lg p-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任崗位 (可複選，僅管理員可編輯)</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">已勝任崗位 (可複選)</label>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-lighting" value="燈光"> 燈光</label>
                             <label class="flex items-center gap-2 p-2.5 border rounded-xl bg-slate-50"><input type="checkbox" id="role-vj" value="VJ"> VJ</label>
@@ -229,7 +229,7 @@
         </section>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (義工設定僅在管理員模式顯示) -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
         <div class="max-w-md mx-auto flex justify-around py-1.5">
             <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
@@ -237,7 +237,7 @@
             <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium hidden"><i class="fa-solid fa-sliders text-base mb-0.5"></i><span class="text-[10px]">手動排班</span></button>
             <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-file-export text-base mb-0.5"></i><span class="text-[10px]">總表</span></button>
             <button id="nav-unavail" onclick="switchTab('unavail')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-calendar-xmark text-base mb-0.5"></i><span class="text-[10px]">請假登記</span></button>
-            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-user text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
+            <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium hidden"><i class="fa-solid fa-user-gear text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
         </div>
     </nav>
 
@@ -280,7 +280,7 @@
             { key: 'Sun_1400', name: '週日 14:00', day: 'Sun' }
         ];
 
-        let isManagerMode = false, managerPassword = "1234", activeUserId = "v1";
+        let isManagerMode = false, managerPassword = "1234", activeUserId = ""; // 預設為空 (請選擇自己的名字)
         let volunteers = [
             { id: 'v1', name: '子祈', contact: '', roles: ['燈光', 'VJ'], learning: '', unavail: [] },
             { id: 'v2', name: 'Joshua', contact: '', roles: ['PPR', '舞監'], learning: '', unavail: [] },
@@ -291,14 +291,9 @@
         ];
         let rosters = {}, weekendDates = [], scheduleFilter = 'all';
 
-        // 安全取得當前選取的義工物件
         function getActiveUser() {
-            let u = volunteers.find(v => v.id === activeUserId || v.id == activeUserId);
-            if (!u && volunteers.length > 0) {
-                u = volunteers[0];
-                activeUserId = u.id;
-            }
-            return u;
+            if (!activeUserId) return null;
+            return volunteers.find(v => v.id === activeUserId || v.id == activeUserId) || null;
         }
 
         async function loadDataFromSupabase() {
@@ -393,6 +388,7 @@
             renderMasterRoster();
         }
 
+        // 當前選取義工選單（包含「請選擇自己的名字」）
         function renderTopUserSelector() {
             const container = document.getElementById('top-user-selector-container');
             if (!container) return;
@@ -400,10 +396,11 @@
             container.innerHTML = `
                 <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm mb-4 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <i class="fa-solid fa-circle-user text-emerald-600 text-xl shrink-0"></i>
+                        <i class="fa-solid fa-circle-user ${curr ? 'text-emerald-600' : 'text-amber-500'} text-xl shrink-0"></i>
                         <div class="text-xs flex-1 min-w-0">
                             <span class="text-slate-400 block text-[10px]">當前選取義工：</span>
-                            <select onchange="switchCurrentUser(this.value)" class="font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs w-full">
+                            <select onchange="switchCurrentUser(this.value)" class="font-bold ${curr ? 'text-slate-800 bg-slate-50' : 'text-amber-700 bg-amber-50 border-amber-300'} border rounded-lg px-2 py-1 text-xs w-full">
+                                <option value="" ${!curr ? 'selected' : ''}>-- 請選擇自己的名字 --</option>
                                 ${volunteers.map(v => `<option value="${v.id}" ${curr && (v.id === curr.id) ? 'selected' : ''}>${v.name}</option>`).join('')}
                             </select>
                         </div>
@@ -416,7 +413,7 @@
             const select = document.getElementById('profile-user-select');
             if (!select) return;
             const curr = getActiveUser();
-            select.innerHTML = volunteers.map(v => `<option value="${v.id}" ${curr && (v.id === curr.id) ? 'selected' : ''}>${v.name}</option>`).join('');
+            select.innerHTML = `<option value="">-- 請選擇義工 --</option>` + volunteers.map(v => `<option value="${v.id}" ${curr && (v.id === curr.id) ? 'selected' : ''}>${v.name}</option>`).join('');
         }
 
         function switchCurrentUser(id) {
@@ -425,45 +422,20 @@
         }
 
         function updateProfileUI() {
-            const u = getActiveUser(); if (!u) return;
-            document.getElementById('profile-name').value = u.name || '';
-            document.getElementById('profile-contact').value = u.contact || '';
-            document.getElementById('profile-learning').value = u.learning || '';
-            document.getElementById('role-lighting').checked = u.roles.includes('燈光');
-            document.getElementById('role-vj').checked = u.roles.includes('VJ');
-            document.getElementById('role-ppr').checked = u.roles.includes('PPR');
-            document.getElementById('role-sm').checked = u.roles.includes('舞監');
-
-            const isReadonly = !isManagerMode;
-            document.getElementById('profile-name').readOnly = isReadonly;
-            document.getElementById('profile-contact').readOnly = isReadonly;
-            document.getElementById('profile-learning').readOnly = isReadonly;
-            
-            ['role-lighting', 'role-vj', 'role-ppr', 'role-sm'].forEach(id => {
-                document.getElementById(id).disabled = isReadonly;
-            });
-
-            const badge = document.getElementById('profile-manager-badge');
-            const saveBtn = document.getElementById('save-profile-btn');
-            const addBtn = document.getElementById('add-volunteer-btn');
-
-            if (isManagerMode) {
-                if (badge) badge.classList.remove('hidden');
-                if (saveBtn) saveBtn.classList.remove('hidden');
-                if (addBtn) addBtn.classList.remove('hidden');
-            } else {
-                if (badge) badge.classList.add('hidden');
-                if (saveBtn) saveBtn.classList.add('hidden');
-                if (addBtn) addBtn.classList.add('hidden');
-            }
+            const u = getActiveUser();
+            document.getElementById('profile-name').value = u ? (u.name || '') : '';
+            document.getElementById('profile-contact').value = u ? (u.contact || '') : '';
+            document.getElementById('profile-learning').value = u ? (u.learning || '') : '';
+            document.getElementById('role-lighting').checked = u ? u.roles.includes('燈光') : false;
+            document.getElementById('role-vj').checked = u ? u.roles.includes('VJ') : false;
+            document.getElementById('role-ppr').checked = u ? u.roles.includes('PPR') : false;
+            document.getElementById('role-sm').checked = u ? u.roles.includes('舞監') : false;
         }
 
         function saveProfile() {
-            if (!isManagerMode) {
-                alert("只有管理者模式可以修改義工資料！");
-                return;
-            }
-            const u = getActiveUser(); if (!u) return;
+            if (!isManagerMode) return;
+            const u = getActiveUser(); 
+            if (!u) { alert("請先選取要編輯的義工！"); return; }
             u.name = document.getElementById('profile-name').value.trim() || u.name;
             u.contact = document.getElementById('profile-contact').value.trim();
             u.learning = document.getElementById('profile-learning').value.trim();
@@ -477,10 +449,7 @@
         }
 
         function addNewVolunteerPrompt() {
-            if (!isManagerMode) {
-                alert("只有管理者模式可以新增義工！");
-                return;
-            }
+            if (!isManagerMode) return;
             const name = prompt("輸入義工姓名：");
             if (!name) return;
             const newV = { id: 'v_' + Date.now(), name: name.trim(), contact: '', learning: '', roles: ['燈光'], unavail: [] };
@@ -489,33 +458,19 @@
         }
 
         function deleteVolunteer(volId, volName) {
-            if (!isManagerMode) {
-                alert("只有管理者模式可以移除義工！");
-                return;
-            }
-            if (volunteers.length <= 1) {
-                alert("至少需要保留一位義工！");
-                return;
-            }
+            if (!isManagerMode) return;
+            if (volunteers.length <= 1) { alert("至少需要保留一位義工！"); return; }
             if (!confirm(`確定要刪除義工「${volName}」嗎？此動作將同步移除其排班紀錄。`)) return;
 
             volunteers = volunteers.filter(v => v.id !== volId);
-
             Object.keys(rosters).forEach(rKey => {
                 ROLES.forEach(r => {
-                    if (rosters[rKey] && rosters[rKey][r] === volId) {
-                        delete rosters[rKey][r];
-                    }
+                    if (rosters[rKey] && rosters[rKey][r] === volId) delete rosters[rKey][r];
                 });
             });
 
-            if (activeUserId === volId) {
-                activeUserId = volunteers[0]?.id || '';
-            }
-
-            syncToSupabase();
-            refreshUI();
-            showToast(`已移除義工：${volName}`);
+            if (activeUserId === volId) activeUserId = '';
+            syncToSupabase(); refreshUI(); showToast(`已移除義工：${volName}`);
         }
 
         function autoGenerateRoster() {
@@ -547,9 +502,7 @@
                 });
             });
 
-            syncToSupabase();
-            refreshUI();
-            showToast("已完成自動智慧排班！");
+            syncToSupabase(); refreshUI(); showToast("已完成自動智慧排班！");
         }
 
         function renderVolunteersLearningSummary() {
@@ -608,11 +561,14 @@
             });
         }
 
-        // 核心強化：確保 100% 渲染出核取方塊
+        // 按場次渲染請假登記頁面
         function renderUnavailDatesTab() {
             const currV = getActiveUser();
             const nameSpan = document.getElementById('unavail-user-name');
-            if (nameSpan) nameSpan.textContent = currV ? currV.name : '未選擇';
+            if (nameSpan) {
+                nameSpan.textContent = currV ? currV.name : '（請先於上方選擇您的名字）';
+                nameSpan.className = currV ? "font-bold text-emerald-700" : "font-bold text-amber-600";
+            }
 
             const listContainer = document.getElementById('unavail-weeks-list');
             const allSessions = getAllSessionsList();
@@ -654,7 +610,10 @@
 
         function saveUnavailDates() {
             const currV = getActiveUser();
-            if (!currV) return;
+            if (!currV) {
+                alert("請先在頂部選擇您的名字後再進行請假儲存！");
+                return;
+            }
 
             const checkboxes = document.querySelectorAll('.unavail-checkbox');
             const selectedSessions = [];
@@ -687,12 +646,14 @@
             if (tab === 'manager') renderManagerBoard();
         }
 
+        // 管理者模式切換邏輯（義工設定隱藏/顯示控制）
         function toggleManagerModePrompt() {
             if (isManagerMode) {
                 isManagerMode = false;
                 document.getElementById('role-mode-text').textContent = "一般義工模式";
                 document.getElementById('manager-control-box').classList.add('hidden');
                 document.getElementById('nav-manager').classList.add('hidden');
+                document.getElementById('nav-profile').classList.add('hidden'); // 隱藏義工設定
                 switchTab('rules');
                 refreshUI();
             } else { document.getElementById('password-modal').classList.remove('hidden'); }
@@ -705,6 +666,7 @@
                 document.getElementById('role-mode-text').textContent = "管理者模式";
                 document.getElementById('manager-control-box').classList.remove('hidden');
                 document.getElementById('nav-manager').classList.remove('hidden');
+                document.getElementById('nav-profile').classList.remove('hidden'); // 顯示義工設定
                 switchTab('manager'); showToast("已進入管理模式");
                 refreshUI();
             } else { document.getElementById('password-error').classList.remove('hidden'); }
