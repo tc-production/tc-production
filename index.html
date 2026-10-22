@@ -120,32 +120,7 @@
             <div id="schedule-cards-list" class="space-y-3.5"></div>
         </section>
 
-        <!-- TAB 3: UNAVAILABLE DATES (不可服事登記) -->
-        <section id="tab-unavail" class="space-y-4 hidden">
-            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                <div class="border-b border-slate-100 pb-2">
-                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-xmark text-rose-500 text-base"></i>
-                        <span>不可服事 / 請假週次登記</span>
-                    </h2>
-                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700"></span>）無法排班的週次：</p>
-                </div>
-                <div id="unavail-weeks-list" class="space-y-2 text-xs"></div>
-                <button onclick="saveUnavailDates()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
-                    <i class="fa-solid fa-floppy-disk"></i> 儲存不可服事設定
-                </button>
-            </div>
-
-            <!-- 全員不可服事統計概況 (所有義工可看) -->
-            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                <h3 class="text-xs font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-clipboard-list text-amber-500"></i> 全員不克服事週次總覽
-                </h3>
-                <div id="unavail-summary-list" class="space-y-2 text-xs"></div>
-            </div>
-        </section>
-
-        <!-- TAB 4: MANAGER WORKSTATION -->
+        <!-- TAB 3: MANAGER WORKSTATION -->
         <section id="tab-manager" class="space-y-4 hidden">
             <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md flex items-center justify-between">
                 <span class="font-bold text-sm"><i class="fa-solid fa-sliders text-amber-400"></i> 管理者手動排班工作台</span>
@@ -158,7 +133,7 @@
             <div id="manager-board-container" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 5: MASTER ROSTER -->
+        <!-- TAB 4: MASTER ROSTER -->
         <section id="tab-admin" class="space-y-4 hidden">
             <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 space-y-2">
                 <div class="font-bold text-sm"><i class="fa-solid fa-file-excel"></i> 排班總表匯出</div>
@@ -183,7 +158,32 @@
             </div>
         </section>
 
-        <!-- TAB 6: PROFILE (排在最後) -->
+        <!-- TAB 5: UNAVAILABLE DATES (不可服事登記，在總表之後、義工設定之前) -->
+        <section id="tab-unavail" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                <div class="border-b border-slate-100 pb-2">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-xmark text-rose-500 text-base"></i>
+                        <span>不可服事 / 請假週次登記</span>
+                    </h2>
+                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700"></span>）無法排班的週次：</p>
+                </div>
+                <div id="unavail-weeks-list" class="space-y-2 text-xs"></div>
+                <button onclick="saveUnavailDates()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+                    <i class="fa-solid fa-floppy-disk"></i> 儲存不可服事設定
+                </button>
+            </div>
+
+            <!-- 全員不可服事統計概況 -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                <h3 class="text-xs font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clipboard-list text-amber-500"></i> 全員不可服事週次總覽
+                </h3>
+                <div id="unavail-summary-list" class="space-y-2 text-xs"></div>
+            </div>
+        </section>
+
+        <!-- TAB 6: PROFILE (義工設定，最後一個選項) -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -229,14 +229,14 @@
         </section>
     </main>
 
-    <!-- Bottom Navigation (義工設定移至最後) -->
+    <!-- Bottom Navigation (請假登記移至總表後、義工設定前) -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
         <div class="max-w-md mx-auto flex justify-around py-1.5">
             <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
             <button id="nav-schedule" onclick="switchTab('schedule')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-base mb-0.5"></i><span class="text-[10px]">輪值表</span></button>
-            <button id="nav-unavail" onclick="switchTab('unavail')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-calendar-xmark text-base mb-0.5"></i><span class="text-[10px]">請假登記</span></button>
             <button id="nav-manager" onclick="switchTab('manager')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium hidden"><i class="fa-solid fa-sliders text-base mb-0.5"></i><span class="text-[10px]">手動排班</span></button>
             <button id="nav-admin" onclick="switchTab('admin')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-file-export text-base mb-0.5"></i><span class="text-[10px]">總表</span></button>
+            <button id="nav-unavail" onclick="switchTab('unavail')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-calendar-xmark text-base mb-0.5"></i><span class="text-[10px]">請假登記</span></button>
             <button id="nav-profile" onclick="switchTab('profile')" class="flex flex-col items-center py-1 px-1 text-slate-400 font-medium"><i class="fa-solid fa-user text-base mb-0.5"></i><span class="text-[10px]">義工設定</span></button>
         </div>
     </nav>
@@ -505,7 +505,6 @@
                     rosters[rKey] = {};
 
                     ROLES.forEach(r => {
-                        // 篩選具備崗位且當週未登記「不可服事」的義工
                         const candidates = volunteers.filter(v => {
                             const isCapable = v.roles.includes(r);
                             const isUnavailable = (v.unavail || []).includes(w.id);
@@ -546,7 +545,6 @@
                 </div>`).join('');
         }
 
-        // 核心功能：渲染服事卡片（加入高亮顯色）
         function renderScheduleCards() {
             const container = document.getElementById('schedule-cards-list'); if (!container) return;
             container.innerHTML = '';
@@ -561,7 +559,6 @@
                         const v = volunteers.find(vol => vol.id === rosterData[r]);
                         const isSelf = v && v.id === activeUserId;
                         
-                        // 高亮顯色樣式：若為當前選擇的義工，使用金黃色顯眼標記！
                         const bgClass = isSelf 
                             ? "bg-amber-100 border-amber-400 text-amber-950 font-bold shadow-sm ring-2 ring-amber-300" 
                             : "bg-slate-50 border-slate-200 text-slate-800";
@@ -583,7 +580,7 @@
             });
         }
 
-        // 渲染「不可服事登記」頁面
+        // 渲染「請假登記」頁面
         function renderUnavailDatesTab() {
             const currV = volunteers.find(v => v.id === activeUserId);
             const nameSpan = document.getElementById('unavail-user-name');
@@ -595,7 +592,7 @@
                 listContainer.innerHTML = weekendDates.map(w => {
                     const isChecked = userUnavail.includes(w.id);
                     return `
-                        <label class="flex items-center justify-between p-2.5 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer">
+                        <label class="flex items-center justify-between p-3 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer">
                             <span class="font-semibold text-slate-700">${w.label} (${w.saturdayStr} ~ ${w.sundayStr})</span>
                             <input type="checkbox" value="${w.id}" class="unavail-checkbox h-4 w-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500" ${isChecked ? 'checked' : ''}>
                         </label>
@@ -603,17 +600,17 @@
                 }).join('');
             }
 
-            // 渲染全體不可服事統計概況
+            // 渲染全體請假概況
             const summaryContainer = document.getElementById('unavail-summary-list');
             if (summaryContainer) {
                 summaryContainer.innerHTML = weekendDates.map(w => {
                     const unavailVols = volunteers.filter(v => (v.unavail || []).includes(w.id));
                     return `
-                        <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-start justify-between gap-2">
+                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
                             <span class="font-bold text-slate-800 shrink-0">${w.label}</span>
                             <div class="text-right">
                                 ${unavailVols.length > 0 
-                                    ? `<span class="text-rose-600 font-medium">${unavailVols.map(v => v.name).join(', ')} 請假</span>` 
+                                    ? `<span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">${unavailVols.map(v => v.name).join(', ')} 請假</span>` 
                                     : `<span class="text-emerald-600 font-medium"><i class="fa-solid fa-check"></i> 全員可服事</span>`}
                             </div>
                         </div>
@@ -635,7 +632,7 @@
             currV.unavail = selectedWeeks;
             syncToSupabase();
             refreshUI();
-            showToast(`已更新 ${currV.name} 的請假週次！`);
+            showToast(`已儲存 ${currV.name} 的請假設定！`);
         }
 
         function filterScheduleView(f) {
@@ -766,6 +763,7 @@
             setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 2000);
         }
 
+        // 確保在載入資料與畫面初始化前，先把 weekendDates 生成出來！
         window.onload = function() {
             weekendDates = generateWeekendDates();
             loadDataFromSupabase();
