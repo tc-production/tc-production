@@ -158,17 +158,17 @@
             </div>
         </section>
 
-        <!-- TAB 5: UNAVAILABLE DATES (不可服事登記，在總表之後、義工設定之前) -->
+        <!-- TAB 5: UNAVAILABLE SESSIONS (按「場次」請假登記，位在總表後、義工設定前) -->
         <section id="tab-unavail" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
                 <div class="border-b border-slate-100 pb-2">
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
                         <i class="fa-solid fa-calendar-xmark text-rose-500 text-base"></i>
-                        <span>不可服事 / 請假週次登記</span>
+                        <span>不可服事 / 請假場次登記</span>
                     </h2>
-                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700"></span>）無法排班的週次：</p>
+                    <p class="text-[11px] text-slate-500 mt-1">請勾選當前選取義工（<span id="unavail-user-name" class="font-bold text-emerald-700">--</span>）無法排班的**具體場次**：</p>
                 </div>
-                <div id="unavail-weeks-list" class="space-y-2 text-xs"></div>
+                <div id="unavail-weeks-list" class="space-y-2 text-xs max-h-96 overflow-y-auto pr-1"></div>
                 <button onclick="saveUnavailDates()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
                     <i class="fa-solid fa-floppy-disk"></i> 儲存不可服事設定
                 </button>
@@ -177,13 +177,13 @@
             <!-- 全員不可服事統計概況 -->
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
                 <h3 class="text-xs font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-clipboard-list text-amber-500"></i> 全員不可服事週次總覽
+                    <i class="fa-solid fa-clipboard-list text-amber-500"></i> 全員不可服事場次總覽
                 </h3>
-                <div id="unavail-summary-list" class="space-y-2 text-xs"></div>
+                <div id="unavail-summary-list" class="space-y-2 text-xs max-h-72 overflow-y-auto pr-1"></div>
             </div>
         </section>
 
-        <!-- TAB 6: PROFILE (義工設定，最後一個選項) -->
+        <!-- TAB 6: PROFILE (義工設定，位於導覽最後) -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -357,6 +357,21 @@
             ];
         }
 
+        function getAllSessionsList() {
+            let allSess = [];
+            weekendDates.forEach(w => {
+                const weekSess = getWeekSessions(w);
+                weekSess.forEach(item => {
+                    allSess.push({
+                        rKey: `${item.d}_${item.s.key}`,
+                        label: `${item.d} ${item.s.name}`,
+                        weekLabel: w.label
+                    });
+                });
+            });
+            return allSess;
+        }
+
         function refreshUI() {
             renderTopUserSelector();
             populateUserSelector();
@@ -507,7 +522,7 @@
                     ROLES.forEach(r => {
                         const candidates = volunteers.filter(v => {
                             const isCapable = v.roles.includes(r);
-                            const isUnavailable = (v.unavail || []).includes(w.id);
+                            const isUnavailable = (v.unavail || []).includes(rKey);
                             return isCapable && !isUnavailable;
                         });
 
@@ -580,38 +595,43 @@
             });
         }
 
-        // 渲染「請假登記」頁面
+        // 核心修正：按「場次」渲染請假登記頁面（含核取方塊）
         function renderUnavailDatesTab() {
             const currV = volunteers.find(v => v.id === activeUserId);
             const nameSpan = document.getElementById('unavail-user-name');
             if (nameSpan && currV) nameSpan.textContent = currV.name;
 
             const listContainer = document.getElementById('unavail-weeks-list');
+            const allSessions = getAllSessionsList();
+
             if (listContainer && currV) {
                 const userUnavail = currV.unavail || [];
-                listContainer.innerHTML = weekendDates.map(w => {
-                    const isChecked = userUnavail.includes(w.id);
+                listContainer.innerHTML = allSessions.map(s => {
+                    const isChecked = userUnavail.includes(s.rKey);
                     return `
-                        <label class="flex items-center justify-between p-3 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer">
-                            <span class="font-semibold text-slate-700">${w.label} (${w.saturdayStr} ~ ${w.sundayStr})</span>
-                            <input type="checkbox" value="${w.id}" class="unavail-checkbox h-4 w-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500" ${isChecked ? 'checked' : ''}>
+                        <label class="flex items-center justify-between p-2.5 rounded-xl border ${isChecked ? 'bg-rose-50 border-rose-300' : 'bg-slate-50 border-slate-200'} transition cursor-pointer">
+                            <div>
+                                <span class="font-bold text-slate-800 text-xs">${s.label}</span>
+                                <span class="text-[10px] text-slate-400 block">${s.weekLabel}</span>
+                            </div>
+                            <input type="checkbox" value="${s.rKey}" class="unavail-checkbox h-4 w-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500" ${isChecked ? 'checked' : ''}>
                         </label>
                     `;
                 }).join('');
             }
 
-            // 渲染全體請假概況
+            // 渲染全體「場次請假」總覽
             const summaryContainer = document.getElementById('unavail-summary-list');
             if (summaryContainer) {
-                summaryContainer.innerHTML = weekendDates.map(w => {
-                    const unavailVols = volunteers.filter(v => (v.unavail || []).includes(w.id));
+                summaryContainer.innerHTML = allSessions.map(s => {
+                    const unavailVols = volunteers.filter(v => (v.unavail || []).includes(s.rKey));
                     return `
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
-                            <span class="font-bold text-slate-800 shrink-0">${w.label}</span>
+                        <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
+                            <span class="font-bold text-slate-800 shrink-0 text-xs">${s.label}</span>
                             <div class="text-right">
                                 ${unavailVols.length > 0 
-                                    ? `<span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">${unavailVols.map(v => v.name).join(', ')} 請假</span>` 
-                                    : `<span class="text-emerald-600 font-medium"><i class="fa-solid fa-check"></i> 全員可服事</span>`}
+                                    ? `<span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 text-[11px]">${unavailVols.map(v => v.name).join(', ')} 請假</span>` 
+                                    : `<span class="text-emerald-600 text-[11px] font-medium"><i class="fa-solid fa-check"></i> 可服事</span>`}
                             </div>
                         </div>
                     `;
@@ -624,15 +644,15 @@
             if (!currV) return;
 
             const checkboxes = document.querySelectorAll('.unavail-checkbox');
-            const selectedWeeks = [];
+            const selectedSessions = [];
             checkboxes.forEach(cb => {
-                if (cb.checked) selectedWeeks.push(parseInt(cb.value));
+                if (cb.checked) selectedSessions.push(cb.value);
             });
 
-            currV.unavail = selectedWeeks;
+            currV.unavail = selectedSessions;
             syncToSupabase();
             refreshUI();
-            showToast(`已儲存 ${currV.name} 的請假設定！`);
+            showToast(`已儲存 ${currV.name} 的場次請假設定！`);
         }
 
         function filterScheduleView(f) {
@@ -649,6 +669,8 @@
             });
             document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
             document.getElementById(`nav-${tab}`)?.classList.replace('text-slate-400', 'text-emerald-600');
+            
+            if (tab === 'unavail') renderUnavailDatesTab();
             if (tab === 'manager') renderManagerBoard();
         }
 
@@ -693,7 +715,7 @@
                         <select onchange="updateRosterAssignment('${rKey}', '${r}', this.value)" class="bg-white border rounded p-1">
                             <option value="">-- 未指派 --</option>
                             ${volunteers.map(v => {
-                                const isUnavail = (v.unavail || []).includes(week.id);
+                                const isUnavail = (v.unavail || []).includes(rKey);
                                 return `<option value="${v.id}" ${rosterData[r] === v.id ? 'selected' : ''}>${v.name}${isUnavail ? ' (請假)' : ''}</option>`;
                             }).join('')}
                         </select>
@@ -763,7 +785,6 @@
             setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 2000);
         }
 
-        // 確保在載入資料與畫面初始化前，先把 weekendDates 生成出來！
         window.onload = function() {
             weekendDates = generateWeekendDates();
             loadDataFromSupabase();
