@@ -183,7 +183,7 @@
             </div>
         </section>
 
-        <!-- TAB 6: PROFILE (收在管理員權限內，預設隱藏) -->
+        <!-- TAB 6: PROFILE -->
         <section id="tab-profile" class="space-y-4 hidden">
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -217,9 +217,15 @@
                         </div>
                     </div>
                 </div>
-                <div id="profile-action-buttons" class="flex gap-2">
-                    <button id="save-profile-btn" onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">更新資料</button>
-                    <button id="add-volunteer-btn" onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200">新增義工</button>
+                <div id="profile-action-buttons" class="flex flex-col gap-2">
+                    <div class="flex gap-2">
+                        <button id="save-profile-btn" onclick="saveProfile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">更新資料</button>
+                        <button id="add-volunteer-btn" onclick="addNewVolunteerPrompt()" class="px-3 bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl text-xs border border-slate-200">新增義工</button>
+                    </div>
+                    <!-- 本機救援按鈕 -->
+                    <button onclick="restoreFromLocalStorage()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-2 rounded-xl text-xs border border-blue-200 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> 救回 / 強制載入瀏覽器舊紀錄
+                    </button>
                 </div>
             </div>
             <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
@@ -229,7 +235,7 @@
         </section>
     </main>
 
-    <!-- Bottom Navigation (義工設定僅在管理員模式顯示) -->
+    <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40">
         <div class="max-w-md mx-auto flex justify-around py-1.5">
             <button id="nav-rules" onclick="switchTab('rules')" class="flex flex-col items-center py-1 px-1 text-emerald-600 font-semibold"><i class="fa-solid fa-book-bookmark text-base mb-0.5"></i><span class="text-[10px]">服事規範</span></button>
@@ -280,7 +286,7 @@
             { key: 'Sun_1400', name: '週日 14:00', day: 'Sun' }
         ];
 
-        let isManagerMode = false, managerPassword = "1234", activeUserId = ""; // 預設為空 (請選擇自己的名字)
+        let isManagerMode = false, managerPassword = "1234", activeUserId = "";
         let volunteers = [
             { id: 'v1', name: '子祈', contact: '', roles: ['燈光', 'VJ'], learning: '', unavail: [] },
             { id: 'v2', name: 'Joshua', contact: '', roles: ['PPR', '舞監'], learning: '', unavail: [] },
@@ -297,17 +303,25 @@
         }
 
         async function loadDataFromSupabase() {
-            if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); loadFromLocal(); return; }
+            // 先載入本機暫存，避免空資料蓋掉快取
+            loadFromLocal();
+
+            if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); return; }
             try {
                 const { data } = await supabaseClient.from('roster_data').select('content').eq('id', 'main_store').maybeSingle();
-                if (data?.content) {
-                    volunteers = data.content.volunteers || volunteers;
+                if (data?.content && Array.isArray(data.content.volunteers) && data.content.volunteers.length > 0) {
+                    volunteers = data.content.volunteers;
                     rosters = data.content.rosters || {};
                     managerPassword = data.content.managerPassword || managerPassword;
                     updateSyncStatus(true, "已同步 Supabase");
-                } else { await syncToSupabase(); }
-            } catch (err) { loadFromLocal(); }
-            refreshUI();
+                    refreshUI();
+                } else { 
+                    // 雲端若為空，將本機資料推送到雲端
+                    await syncToSupabase(); 
+                }
+            } catch (err) { 
+                updateSyncStatus(false, "離線暫存模式");
+            }
         }
 
         async function syncToSupabase() {
@@ -320,9 +334,22 @@
 
         function loadFromLocal() {
             const v = localStorage.getItem('church_vols'), r = localStorage.getItem('church_rosters');
-            if (v) volunteers = JSON.parse(v);
-            if (r) rosters = JSON.parse(r);
+            if (v) { try { volunteers = JSON.parse(v); } catch(e){} }
+            if (r) { try { rosters = JSON.parse(r); } catch(e){} }
             refreshUI();
+        }
+
+        function restoreFromLocalStorage() {
+            const v = localStorage.getItem('church_vols'), r = localStorage.getItem('church_rosters');
+            if (v) {
+                volunteers = JSON.parse(v);
+                if (r) rosters = JSON.parse(r);
+                syncToSupabase();
+                refreshUI();
+                showToast("已救回本機舊紀錄並同步至雲端！");
+            } else {
+                showToast("這台裝置未找到瀏覽器舊紀錄");
+            }
         }
 
         function updateSyncStatus(online, msg) {
@@ -388,7 +415,6 @@
             renderMasterRoster();
         }
 
-        // 當前選取義工選單（包含「請選擇自己的名字」）
         function renderTopUserSelector() {
             const container = document.getElementById('top-user-selector-container');
             if (!container) return;
@@ -426,10 +452,10 @@
             document.getElementById('profile-name').value = u ? (u.name || '') : '';
             document.getElementById('profile-contact').value = u ? (u.contact || '') : '';
             document.getElementById('profile-learning').value = u ? (u.learning || '') : '';
-            document.getElementById('role-lighting').checked = u ? u.roles.includes('燈光') : false;
-            document.getElementById('role-vj').checked = u ? u.roles.includes('VJ') : false;
-            document.getElementById('role-ppr').checked = u ? u.roles.includes('PPR') : false;
-            document.getElementById('role-sm').checked = u ? u.roles.includes('舞監') : false;
+            document.getElementById('role-lighting').checked = u ? (u.roles || []).includes('燈光') : false;
+            document.getElementById('role-vj').checked = u ? (u.roles || []).includes('VJ') : false;
+            document.getElementById('role-ppr').checked = u ? (u.roles || []).includes('PPR') : false;
+            document.getElementById('role-sm').checked = u ? (u.roles || []).includes('舞監') : false;
         }
 
         function saveProfile() {
@@ -487,7 +513,7 @@
 
                     ROLES.forEach(r => {
                         const candidates = volunteers.filter(v => {
-                            const isCapable = v.roles.includes(r);
+                            const isCapable = (v.roles || []).includes(r);
                             const isUnavailable = (v.unavail || []).includes(rKey);
                             return isCapable && !isUnavailable;
                         });
@@ -512,7 +538,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 font-bold">
                             <span class="text-slate-800">${v.name}</span>
-                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">${v.roles.join(', ') || '無崗位'}</span>
+                            <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">${(v.roles || []).join(', ') || '無崗位'}</span>
                         </div>
                         <div class="text-[11px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded mt-1 truncate">${v.learning || '無特別註記'}</div>
                     </div>
@@ -561,7 +587,6 @@
             });
         }
 
-        // 按場次渲染請假登記頁面
         function renderUnavailDatesTab() {
             const currV = getActiveUser();
             const nameSpan = document.getElementById('unavail-user-name');
@@ -589,7 +614,6 @@
                 }).join('');
             }
 
-            // 渲染全體「場次請假」總覽
             const summaryContainer = document.getElementById('unavail-summary-list');
             if (summaryContainer) {
                 summaryContainer.innerHTML = allSessions.map(s => {
@@ -646,14 +670,13 @@
             if (tab === 'manager') renderManagerBoard();
         }
 
-        // 管理者模式切換邏輯（義工設定隱藏/顯示控制）
         function toggleManagerModePrompt() {
             if (isManagerMode) {
                 isManagerMode = false;
                 document.getElementById('role-mode-text').textContent = "一般義工模式";
                 document.getElementById('manager-control-box').classList.add('hidden');
                 document.getElementById('nav-manager').classList.add('hidden');
-                document.getElementById('nav-profile').classList.add('hidden'); // 隱藏義工設定
+                document.getElementById('nav-profile').classList.add('hidden');
                 switchTab('rules');
                 refreshUI();
             } else { document.getElementById('password-modal').classList.remove('hidden'); }
@@ -666,7 +689,7 @@
                 document.getElementById('role-mode-text').textContent = "管理者模式";
                 document.getElementById('manager-control-box').classList.remove('hidden');
                 document.getElementById('nav-manager').classList.remove('hidden');
-                document.getElementById('nav-profile').classList.remove('hidden'); // 顯示義工設定
+                document.getElementById('nav-profile').classList.remove('hidden');
                 switchTab('manager'); showToast("已進入管理模式");
                 refreshUI();
             } else { document.getElementById('password-error').classList.remove('hidden'); }
