@@ -303,7 +303,6 @@
         }
 
         async function loadDataFromSupabase() {
-            // 先載入本機暫存，避免空資料蓋掉快取
             loadFromLocal();
 
             if (!supabaseClient) { updateSyncStatus(false, "本機暫存模式"); return; }
@@ -316,7 +315,6 @@
                     updateSyncStatus(true, "已同步 Supabase");
                     refreshUI();
                 } else { 
-                    // 雲端若為空，將本機資料推送到雲端
                     await syncToSupabase(); 
                 }
             } catch (err) { 
@@ -499,6 +497,7 @@
             syncToSupabase(); refreshUI(); showToast(`已移除義工：${volName}`);
         }
 
+        // 自動排班邏輯：加入「同場次不重複排班」防護
         function autoGenerateRoster() {
             if (!confirm("確定要自動生成智慧排班嗎？這將考慮義工不可服事時間並覆蓋現有排班！")) return;
 
@@ -512,10 +511,14 @@
                     rosters[rKey] = {};
 
                     ROLES.forEach(r => {
+                        // 取得目前該場次已被指派的同工 ID 陣列 (避免同一個場次重複安排同一個人)
+                        const currentSessionAssignedIds = Object.values(rosters[rKey]);
+
                         const candidates = volunteers.filter(v => {
                             const isCapable = (v.roles || []).includes(r);
                             const isUnavailable = (v.unavail || []).includes(rKey);
-                            return isCapable && !isUnavailable;
+                            const isAlreadyAssignedInThisSession = currentSessionAssignedIds.includes(v.id);
+                            return isCapable && !isUnavailable && !isAlreadyAssignedInThisSession;
                         });
 
                         if (candidates.length > 0) {
